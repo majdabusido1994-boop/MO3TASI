@@ -20,6 +20,8 @@ const en = {
     servicesTitle: "What I Offer",
     quoteText: "\"Every body carries a story. My work is to listen, to move with it, and to help it breathe again.\"",
     testimonialsTitle: "What People Say",
+    instagramTitle: "Follow the Journey",
+    instagramCta: "View on Instagram",
   },
   about: {
     title: "About Moatasem",
@@ -82,8 +84,13 @@ const en = {
       time: "Preferred Time",
       message: "Message (optional)",
       submit: "Request Booking",
+      submitting: "Sending...",
       success: "Thank you! Your booking request has been sent. I'll get back to you soon.",
+      error: "Something went wrong. Please try again or contact us directly via WhatsApp.",
+      whatsappFallback: "Or book directly via",
     },
+    modeForm: "Send Request",
+    modeCalendly: "Schedule Directly",
   },
   philosophy: {
     title: "Philosophy",

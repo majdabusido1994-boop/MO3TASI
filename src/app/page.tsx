@@ -6,6 +6,7 @@ import Hero from "@/components/Hero";
 import SectionHeading from "@/components/SectionHeading";
 import ServiceCard from "@/components/ServiceCard";
 import TestimonialCard from "@/components/TestimonialCard";
+import InstagramFeed from "@/components/InstagramFeed";
 import { useI18n } from "@/lib/i18n";
 
 export default function Home() {
@@ -101,6 +102,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Instagram Feed */}
+      <InstagramFeed />
     </>
   );
 }

@@ -48,6 +48,8 @@ export interface Dictionary {
     servicesTitle: string;
     quoteText: string;
     testimonialsTitle: string;
+    instagramTitle: string;
+    instagramCta: string;
   };
   about: {
     title: string;
@@ -77,8 +79,13 @@ export interface Dictionary {
       time: string;
       message: string;
       submit: string;
+      submitting: string;
       success: string;
+      error: string;
+      whatsappFallback: string;
     };
+    modeForm: string;
+    modeCalendly: string;
   };
   philosophy: {
     title: string;
