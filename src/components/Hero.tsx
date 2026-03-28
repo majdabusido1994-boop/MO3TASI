@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
 import Link from "next/link";
 import { useI18n } from "@/lib/i18n";
@@ -8,51 +8,70 @@ import { useI18n } from "@/lib/i18n";
 export default function Hero() {
   const { t } = useI18n();
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [videoFailed, setVideoFailed] = useState(false);
 
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
-    // Mobile browsers may block autoplay even when muted — retry on visibility
     const tryPlay = () => {
-      video.play().catch(() => {});
+      const p = video.play();
+      if (p) p.catch(() => setVideoFailed(true));
     };
 
+    // Ensure muted attribute is set (some mobile browsers need this programmatically)
+    video.muted = true;
+    video.setAttribute("muted", "");
+    video.setAttribute("playsinline", "");
+    video.setAttribute("webkit-playsinline", "");
+
+    video.addEventListener("canplay", tryPlay);
     tryPlay();
 
-    document.addEventListener("visibilitychange", () => {
+    const onVisibility = () => {
       if (document.visibilityState === "visible") tryPlay();
-    });
-    // Also try on first user interaction (tap/scroll)
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+
     const onInteract = () => {
       tryPlay();
       window.removeEventListener("touchstart", onInteract);
-      window.removeEventListener("scroll", onInteract);
+      window.removeEventListener("click", onInteract);
     };
     window.addEventListener("touchstart", onInteract, { passive: true });
-    window.addEventListener("scroll", onInteract, { passive: true });
+    window.addEventListener("click", onInteract, { passive: true });
 
     return () => {
+      video.removeEventListener("canplay", tryPlay);
+      document.removeEventListener("visibilitychange", onVisibility);
       window.removeEventListener("touchstart", onInteract);
-      window.removeEventListener("scroll", onInteract);
+      window.removeEventListener("click", onInteract);
     };
   }, []);
 
   return (
     <section className="relative h-screen min-h-[700px] flex items-center justify-center overflow-hidden">
-      {/* Background Video */}
-      <video
-        ref={videoRef}
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="auto"
-        className="absolute inset-0 w-full h-full object-cover"
-        poster="/images/hero-poster.jpg"
-      >
-        <source src="/videos/ocean-surf.mp4" type="video/mp4" />
-      </video>
+      {/* Background Video / Fallback Image */}
+      {videoFailed ? (
+        <img
+          src="/images/hero-poster.jpg"
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+      ) : (
+        <video
+          ref={videoRef}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          className="absolute inset-0 w-full h-full object-cover"
+          poster="/images/hero-poster.jpg"
+        >
+          <source src="/videos/ocean-surf.mp4" type="video/mp4" />
+        </video>
+      )}
 
       {/* Gradient Overlay */}
       <div className="absolute inset-0 hero-overlay" />
