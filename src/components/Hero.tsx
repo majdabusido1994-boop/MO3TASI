@@ -42,15 +42,7 @@ export default function Hero() {
   }, []);
 
   return (
-    <section className="relative h-screen min-h-[700px] flex items-center justify-center overflow-hidden">
-      {/* Fallback poster until video plays */}
-      {!videoPlaying && (
-        <img
-          src="/images/hero-poster.jpg"
-          alt=""
-          className="absolute inset-0 w-full h-full object-cover"
-        />
-      )}
+    <section className="relative h-screen min-h-[700px] flex items-center justify-center overflow-hidden bg-ocean-950">
       {/* Background Video */}
       <video
         ref={videoRef}
@@ -60,7 +52,6 @@ export default function Hero() {
         playsInline
         preload="auto"
         className="absolute inset-0 w-full h-full object-cover"
-        poster="/images/hero-poster.jpg"
       >
         <source src="/videos/ocean-surf.mp4" type="video/mp4" />
       </video>
