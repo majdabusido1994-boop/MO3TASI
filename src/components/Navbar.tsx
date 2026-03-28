@@ -40,9 +40,9 @@ export default function Navbar() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
             <img
-              src="/images/logo.png"
+              src="/images/logo-icon.png"
               alt="Moatasem Akash"
-              className="h-10 w-auto"
+              className="h-9 w-auto"
             />
             <span
               className={`text-xl font-semibold tracking-wide transition-colors duration-500 ${

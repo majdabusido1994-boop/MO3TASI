@@ -3,6 +3,7 @@
 import { I18nProvider, useI18n } from "@/lib/i18n";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import MusicPlayer from "@/components/MusicPlayer";
 
 function LayoutInner({ children }: { children: React.ReactNode }) {
   const { dir } = useI18n();
@@ -12,6 +13,7 @@ function LayoutInner({ children }: { children: React.ReactNode }) {
       <Navbar />
       <main className="page-transition">{children}</main>
       <Footer />
+      <MusicPlayer />
     </div>
   );
 }
