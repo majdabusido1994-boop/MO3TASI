@@ -32,11 +32,16 @@ export default function InstagramFeed() {
   useEffect(() => {
     async function fetchInstagram() {
       try {
-        const res = await fetch("/api/instagram");
+        const token = process.env.NEXT_PUBLIC_INSTAGRAM_ACCESS_TOKEN;
+        if (!token) throw new Error("No token");
+        const fields = "id,media_url,permalink,caption,media_type,thumbnail_url";
+        const res = await fetch(
+          `https://graph.instagram.com/me/media?fields=${fields}&limit=6&access_token=${token}`
+        );
         if (!res.ok) throw new Error("Failed to fetch");
         const data = await res.json();
-        if (data.posts && data.posts.length > 0) {
-          setPosts(data.posts.slice(0, 6));
+        if (data.data && data.data.length > 0) {
+          setPosts(data.data.slice(0, 6));
         }
       } catch {
         // Will show placeholders

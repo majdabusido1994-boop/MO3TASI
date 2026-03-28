@@ -32,10 +32,15 @@ export default function BookingForm() {
     };
 
     try {
-      const res = await fetch("/api/booking", {
+      // Submit to Netlify Forms
+      const netlifyForm = new URLSearchParams();
+      netlifyForm.append("form-name", "booking");
+      Object.entries(data).forEach(([key, val]) => netlifyForm.append(key, val));
+
+      const res = await fetch("/", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: netlifyForm.toString(),
       });
 
       if (!res.ok) {

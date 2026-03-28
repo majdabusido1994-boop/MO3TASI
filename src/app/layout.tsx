@@ -45,6 +45,23 @@ export default function RootLayout({
         className="antialiased bg-white text-ocean-900"
         style={{ fontFamily: "var(--font-body)" }}
       >
+        {/* Hidden Netlify form for bot detection */}
+        <form name="booking" data-netlify="true" hidden>
+          <input type="hidden" name="form-name" value="booking" />
+          <input name="name" />
+          <input name="email" />
+          <input name="phone" />
+          <input name="service" />
+          <input name="date" />
+          <input name="time" />
+          <textarea name="message" />
+        </form>
+        <form name="contact" data-netlify="true" hidden>
+          <input type="hidden" name="form-name" value="contact" />
+          <input name="name" />
+          <input name="email" />
+          <textarea name="message" />
+        </form>
         <ClientLayout>{children}</ClientLayout>
       </body>
     </html>
