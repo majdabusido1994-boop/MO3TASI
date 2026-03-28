@@ -12,17 +12,17 @@ export default function ServicesPage() {
     {
       ...t.services.therapy,
       icon: FaHeartbeat,
-      gradient: "from-ocean-500 to-teal-500",
+      image: "/images/services-therapy.jpg",
     },
     {
       ...t.services.massage,
       icon: FaHandsHelping,
-      gradient: "from-teal-500 to-teal-600",
+      image: "/images/services-massage.jpg",
     },
     {
       ...t.services.surf,
       icon: FaWater,
-      gradient: "from-ocean-600 to-ocean-800",
+      image: "/images/services-surf.jpg",
     },
   ];
 
@@ -73,13 +73,14 @@ export default function ServicesPage() {
               >
                 {/* Visual */}
                 <div className={`${!isEven ? "lg:order-2" : ""}`}>
-                  <div
-                    className={`aspect-[4/3] rounded-2xl bg-gradient-to-br ${service.gradient} flex items-center justify-center relative overflow-hidden`}
-                  >
-                    <div className="absolute inset-0 opacity-20">
-                      <div className="absolute bottom-0 right-0 w-64 h-64 bg-white rounded-full blur-3xl" />
-                    </div>
-                    <Icon className="text-white/30 text-8xl relative z-10" />
+                  <div className="aspect-[4/3] rounded-2xl overflow-hidden relative group">
+                    <img
+                      src={service.image}
+                      alt={service.title}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-ocean-900/30 to-transparent" />
                   </div>
                 </div>
 

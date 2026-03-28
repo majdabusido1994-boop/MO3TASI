@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
+import Image from "next/image";
 import SectionHeading from "@/components/SectionHeading";
 import { useI18n } from "@/lib/i18n";
 
@@ -36,22 +37,97 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Story */}
+      {/* Story with Images */}
       <section className="py-24 px-6">
-        <div className="max-w-3xl mx-auto">
-          <div className="space-y-6">
-            {Object.values(t.about.story).map((paragraph, i) => (
-              <motion.p
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: i * 0.1 }}
-                className="text-ocean-700 text-base leading-relaxed"
-              >
-                {paragraph}
-              </motion.p>
-            ))}
+        <div className="max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mb-20">
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7 }}
+            >
+              <div className="relative">
+                <div className="rounded-2xl overflow-hidden shadow-xl">
+                  <Image
+                    src="/images/about-2.jpg"
+                    alt="Moatasem Akash longboard surfing"
+                    width={600}
+                    height={450}
+                    className="w-full h-auto object-cover"
+                    priority
+                  />
+                </div>
+                <div className="absolute -bottom-6 -right-6 rounded-xl overflow-hidden shadow-lg w-40 h-40 border-4 border-white hidden md:block">
+                  <Image
+                    src="/images/about-1.jpg"
+                    alt="Moatasem surfing a wave"
+                    width={160}
+                    height={160}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              </div>
+            </motion.div>
+            <div className="space-y-6">
+              {Object.values(t.about.story).slice(0, 2).map((paragraph, i) => (
+                <motion.p
+                  key={i}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: i * 0.1 }}
+                  className="text-ocean-700 text-base leading-relaxed"
+                >
+                  {paragraph}
+                </motion.p>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div className="space-y-6 lg:order-1">
+              {Object.values(t.about.story).slice(2).map((paragraph, i) => (
+                <motion.p
+                  key={i}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: i * 0.1 }}
+                  className="text-ocean-700 text-base leading-relaxed"
+                >
+                  {paragraph}
+                </motion.p>
+              ))}
+            </div>
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7 }}
+              className="lg:order-2"
+            >
+              <div className="grid grid-cols-2 gap-3">
+                <div className="rounded-2xl overflow-hidden shadow-lg">
+                  <Image
+                    src="/images/about-3.jpg"
+                    alt="Moatasem riding a wave"
+                    width={300}
+                    height={400}
+                    className="w-full h-64 object-cover"
+                  />
+                </div>
+                <div className="rounded-2xl overflow-hidden shadow-lg mt-8">
+                  <Image
+                    src="/images/services-therapy.jpg"
+                    alt="Moatasem on the ocean"
+                    width={300}
+                    height={400}
+                    className="w-full h-64 object-cover"
+                  />
+                </div>
+              </div>
+            </motion.div>
           </div>
         </div>
       </section>
