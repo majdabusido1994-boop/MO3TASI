@@ -1,21 +1,53 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { motion } from "motion/react";
 import Link from "next/link";
 import { useI18n } from "@/lib/i18n";
 
 export default function Hero() {
   const { t } = useI18n();
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    // Mobile browsers may block autoplay even when muted — retry on visibility
+    const tryPlay = () => {
+      video.play().catch(() => {});
+    };
+
+    tryPlay();
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") tryPlay();
+    });
+    // Also try on first user interaction (tap/scroll)
+    const onInteract = () => {
+      tryPlay();
+      window.removeEventListener("touchstart", onInteract);
+      window.removeEventListener("scroll", onInteract);
+    };
+    window.addEventListener("touchstart", onInteract, { passive: true });
+    window.addEventListener("scroll", onInteract, { passive: true });
+
+    return () => {
+      window.removeEventListener("touchstart", onInteract);
+      window.removeEventListener("scroll", onInteract);
+    };
+  }, []);
 
   return (
     <section className="relative h-screen min-h-[700px] flex items-center justify-center overflow-hidden">
       {/* Background Video */}
       <video
+        ref={videoRef}
         autoPlay
         muted
         loop
         playsInline
-        preload="metadata"
+        preload="auto"
         className="absolute inset-0 w-full h-full object-cover"
         poster="/images/hero-poster.jpg"
       >

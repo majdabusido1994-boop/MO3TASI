@@ -1,37 +1,31 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useCallback } from "react";
 import { HiVolumeUp, HiVolumeOff } from "react-icons/hi";
 
 export default function MusicPlayer() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [playing, setPlaying] = useState(false);
-  const [hasInteracted, setHasInteracted] = useState(false);
 
-  useEffect(() => {
-    const audio = new Audio("/audio/ambient.mp3");
-    audio.loop = true;
-    audio.volume = 0.08;
-    audioRef.current = audio;
-
-    return () => {
-      audio.pause();
-      audio.src = "";
-    };
+  // Create audio on first user tap — required by iOS/Android autoplay policies
+  const getAudio = useCallback(() => {
+    if (!audioRef.current) {
+      const audio = new Audio("/audio/ambient.mp3");
+      audio.loop = true;
+      audio.volume = 0.08;
+      audioRef.current = audio;
+    }
+    return audioRef.current;
   }, []);
 
   const toggle = () => {
-    if (!audioRef.current) return;
-
-    if (!hasInteracted) {
-      setHasInteracted(true);
-    }
+    const audio = getAudio();
 
     if (playing) {
-      audioRef.current.pause();
+      audio.pause();
       setPlaying(false);
     } else {
-      audioRef.current.play().catch(() => {});
+      audio.play().catch(() => {});
       setPlaying(true);
     }
   };
