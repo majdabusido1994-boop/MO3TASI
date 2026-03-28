@@ -3,156 +3,191 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import Link from "next/link";
 
-// Game constants
-const CANVAS_W = 400;
-const CANVAS_H = 600;
-const GRAVITY = 0.35;
-const JUMP_FORCE = -8;
-const OBSTACLE_SPEED_START = 3;
-const OBSTACLE_GAP = 180;
-const SPAWN_INTERVAL_START = 90;
+const W = 800;
+const H = 400;
+const GROUND = 310;
+const PLAYER_W = 70;
+const PLAYER_H = 80;
+const JUMP_VEL = -12;
+const GRAVITY = 0.6;
 
-interface Obstacle {
-  x: number;
-  gapY: number;
-  passed: boolean;
-}
+const SURF_PHOTOS = [
+  "/images/about-1.jpg",
+  "/images/about-2.jpg",
+  "/images/about-3.jpg",
+  "/images/services-surf.jpg",
+];
 
-interface Particle {
+const TIPS = [
+  '"Feel the wave, become the wave." — Moatasem',
+  '"The ocean teaches patience." — Moatasem',
+  '"Every wipeout is a lesson." — Moatasem',
+  '"Ride with your soul, not just your feet." — Moatasem',
+  '"The board is an extension of your spirit." — Moatasem',
+  '"Haifa waves know your name." — Moatasem',
+];
+
+interface Shell {
   x: number;
   y: number;
+  collected: boolean;
+  bob: number;
+}
+
+interface Rock {
+  x: number;
+  w: number;
+  h: number;
+}
+
+interface Splash {
+  x: number;
+  y: number;
+  life: number;
   vx: number;
   vy: number;
-  life: number;
-  maxLife: number;
   size: number;
 }
 
 export default function GamePage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const gameRef = useRef({
-    playerY: 250,
-    velocity: 0,
-    obstacles: [] as Obstacle[],
-    particles: [] as Particle[],
-    score: 0,
-    highScore: 0,
-    frame: 0,
-    running: false,
-    gameOver: false,
-    speed: OBSTACLE_SPEED_START,
-    waveOffset: 0,
-  });
+  const [screen, setScreen] = useState<"menu" | "play" | "over">("menu");
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState(0);
-  const [gameOver, setGameOver] = useState(false);
-  const [started, setStarted] = useState(false);
-  const rafRef = useRef<number>(0);
+  const [tip, setTip] = useState("");
+  const [menuImg, setMenuImg] = useState<HTMLImageElement | null>(null);
+  const gameRef = useRef({
+    y: GROUND - PLAYER_H,
+    vy: 0,
+    grounded: true,
+    rocks: [] as Rock[],
+    shells: [] as Shell[],
+    splashes: [] as Splash[],
+    score: 0,
+    dist: 0,
+    speed: 5,
+    frame: 0,
+    running: false,
+    wavePhase: 0,
+    highScore: 0,
+  });
+  const rafRef = useRef(0);
 
-  const spawnObstacle = useCallback(() => {
-    const g = gameRef.current;
-    const gapY = 80 + Math.random() * (CANVAS_H - 200);
-    g.obstacles.push({ x: CANVAS_W + 20, gapY, passed: false });
+  // Load high score + menu image
+  useEffect(() => {
+    try {
+      const s = localStorage.getItem("mo3surf");
+      if (s) {
+        const v = parseInt(s, 10);
+        gameRef.current.highScore = v;
+        setHighScore(v);
+      }
+    } catch {}
+
+    const img = new Image();
+    img.src = SURF_PHOTOS[Math.floor(Math.random() * SURF_PHOTOS.length)];
+    img.onload = () => setMenuImg(img);
   }, []);
 
-  const addSplash = useCallback((x: number, y: number) => {
-    const g = gameRef.current;
-    for (let i = 0; i < 6; i++) {
-      g.particles.push({
-        x,
-        y,
-        vx: (Math.random() - 0.5) * 4,
-        vy: -Math.random() * 3 - 1,
-        life: 20 + Math.random() * 15,
-        maxLife: 35,
-        size: 2 + Math.random() * 3,
-      });
-    }
-  }, []);
-
-  const drawSurfer = useCallback(
-    (ctx: CanvasRenderingContext2D, x: number, y: number, vel: number) => {
+  const drawPlayer = useCallback(
+    (ctx: CanvasRenderingContext2D, x: number, y: number, jumping: boolean) => {
       ctx.save();
-      ctx.translate(x, y);
-      const tilt = Math.min(Math.max(vel * 2, -15), 15);
-      ctx.rotate((tilt * Math.PI) / 180);
+      ctx.translate(x + PLAYER_W / 2, y + PLAYER_H / 2);
+      if (jumping) ctx.rotate(-0.15);
 
       // Surfboard
       ctx.fillStyle = "#facc15";
+      ctx.strokeStyle = "#b45309";
+      ctx.lineWidth = 1.5;
       ctx.beginPath();
-      ctx.ellipse(0, 18, 22, 5, 0, 0, Math.PI * 2);
+      ctx.ellipse(0, 30, 34, 6, 0, 0, Math.PI * 2);
       ctx.fill();
-      ctx.strokeStyle = "#ca8a04";
-      ctx.lineWidth = 1;
+      ctx.stroke();
+      // Board stripe
+      ctx.fillStyle = "#14b8a6";
+      ctx.beginPath();
+      ctx.ellipse(0, 30, 34, 2, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Legs
+      ctx.strokeStyle = "#d4a574";
+      ctx.lineWidth = 4;
+      ctx.lineCap = "round";
+      ctx.beginPath();
+      ctx.moveTo(-6, 12);
+      ctx.lineTo(-8, 24);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(6, 12);
+      ctx.lineTo(8, 24);
       ctx.stroke();
 
-      // Surfboard stripe
-      ctx.fillStyle = "#14b8a6";
-      ctx.fillRect(-12, 16, 24, 3);
-
-      // Body
-      ctx.fillStyle = "#f59e0b";
-      ctx.fillRect(-6, -4, 12, 18);
-
-      // Shorts
-      ctx.fillStyle = "#14b8a6";
-      ctx.fillRect(-6, 8, 12, 8);
-
-      // Head
-      ctx.fillStyle = "#fbbf24";
+      // Body (wetsuit)
+      ctx.fillStyle = "#1e293b";
       ctx.beginPath();
-      ctx.arc(0, -10, 8, 0, Math.PI * 2);
+      ctx.roundRect(-10, -12, 20, 26, 4);
       ctx.fill();
-
-      // Hair / headband
-      ctx.fillStyle = "#0c4a6e";
-      ctx.beginPath();
-      ctx.arc(0, -13, 8, Math.PI, Math.PI * 2);
-      ctx.fill();
-
-      // Headband
-      ctx.fillStyle = "#ef4444";
-      ctx.fillRect(-8, -12, 16, 3);
-
-      // Face
-      ctx.fillStyle = "#0c4a6e";
-      ctx.beginPath();
-      ctx.arc(-3, -10, 1.2, 0, Math.PI * 2);
-      ctx.arc(3, -10, 1.2, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Smile
-      ctx.strokeStyle = "#0c4a6e";
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.arc(0, -8, 3, 0.1, Math.PI - 0.1);
-      ctx.stroke();
 
       // Arms
-      ctx.strokeStyle = "#fbbf24";
-      ctx.lineWidth = 3;
-      ctx.lineCap = "round";
-      // Left arm (wave gesture)
+      ctx.strokeStyle = "#d4a574";
+      ctx.lineWidth = 4;
+      const armWave = Math.sin(Date.now() / 200) * 5;
+      // Left arm out for balance
       ctx.beginPath();
-      ctx.moveTo(-6, 2);
-      ctx.lineTo(-16, -4 + Math.sin(Date.now() / 200) * 3);
+      ctx.moveTo(-10, -2);
+      ctx.lineTo(-24, -10 + armWave);
       ctx.stroke();
       // Right arm
       ctx.beginPath();
-      ctx.moveTo(6, 2);
-      ctx.lineTo(16, -2 + Math.sin(Date.now() / 250) * 2);
+      ctx.moveTo(10, -2);
+      ctx.lineTo(24, -14 + armWave * -0.7);
       ctx.stroke();
 
-      // Legs
-      ctx.strokeStyle = "#fbbf24";
-      ctx.lineWidth = 3;
+      // Hands
+      ctx.fillStyle = "#d4a574";
       ctx.beginPath();
-      ctx.moveTo(-3, 16);
-      ctx.lineTo(-4, 22);
-      ctx.stroke();
+      ctx.arc(-24, -10 + armWave, 3, 0, Math.PI * 2);
+      ctx.arc(24, -14 + armWave * -0.7, 3, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Head
+      ctx.fillStyle = "#d4a574";
       ctx.beginPath();
-      ctx.moveTo(3, 16);
-      ctx.lineTo(4, 22);
+      ctx.arc(0, -22, 10, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Hair (long, flowing)
+      ctx.fillStyle = "#1a1a1a";
+      ctx.beginPath();
+      ctx.arc(0, -25, 10, Math.PI, Math.PI * 2.1);
+      ctx.fill();
+      // Flowing hair behind
+      ctx.beginPath();
+      ctx.moveTo(-4, -28);
+      ctx.quadraticCurveTo(-14, -22, -18 + armWave * 0.3, -16);
+      ctx.quadraticCurveTo(-12, -20, -6, -24);
+      ctx.fill();
+
+      // Beard
+      ctx.fillStyle = "#2a2a2a";
+      ctx.beginPath();
+      ctx.moveTo(-5, -16);
+      ctx.quadraticCurveTo(0, -10, 5, -16);
+      ctx.quadraticCurveTo(0, -8, -5, -16);
+      ctx.fill();
+
+      // Eyes
+      ctx.fillStyle = "#1a1a1a";
+      ctx.beginPath();
+      ctx.arc(-3, -23, 1.5, 0, Math.PI * 2);
+      ctx.arc(3, -23, 1.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Smile
+      ctx.strokeStyle = "#1a1a1a";
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.arc(0, -19, 3, 0.2, Math.PI - 0.2);
       ctx.stroke();
 
       ctx.restore();
@@ -160,27 +195,45 @@ export default function GamePage() {
     []
   );
 
-  const drawWave = useCallback(
-    (
-      ctx: CanvasRenderingContext2D,
-      yBase: number,
-      amplitude: number,
-      color: string,
-      offset: number,
-      speed: number
-    ) => {
-      ctx.fillStyle = color;
+  const drawWaves = useCallback(
+    (ctx: CanvasRenderingContext2D, phase: number) => {
+      // Far wave
+      ctx.fillStyle = "rgba(14,165,233,0.25)";
       ctx.beginPath();
-      ctx.moveTo(0, CANVAS_H);
-      for (let x = 0; x <= CANVAS_W; x += 4) {
-        const y =
-          yBase +
-          Math.sin((x + offset * speed) * 0.02) * amplitude +
-          Math.sin((x + offset * speed * 0.7) * 0.01) * amplitude * 0.5;
-        ctx.lineTo(x, y);
+      ctx.moveTo(0, H);
+      for (let x = 0; x <= W; x += 3) {
+        ctx.lineTo(
+          x,
+          GROUND + 20 + Math.sin((x + phase * 0.5) * 0.015) * 12 + Math.sin((x + phase * 0.3) * 0.03) * 5
+        );
       }
-      ctx.lineTo(CANVAS_W, CANVAS_H);
-      ctx.closePath();
+      ctx.lineTo(W, H);
+      ctx.fill();
+
+      // Main wave surface
+      ctx.fillStyle = "rgba(6,182,212,0.35)";
+      ctx.beginPath();
+      ctx.moveTo(0, H);
+      for (let x = 0; x <= W; x += 3) {
+        ctx.lineTo(
+          x,
+          GROUND + 8 + Math.sin((x + phase) * 0.02) * 8 + Math.sin((x + phase * 1.3) * 0.04) * 4
+        );
+      }
+      ctx.lineTo(W, H);
+      ctx.fill();
+
+      // Front foam
+      ctx.fillStyle = "rgba(255,255,255,0.2)";
+      ctx.beginPath();
+      ctx.moveTo(0, H);
+      for (let x = 0; x <= W; x += 3) {
+        ctx.lineTo(
+          x,
+          GROUND + 30 + Math.sin((x + phase * 1.5) * 0.025) * 6
+        );
+      }
+      ctx.lineTo(W, H);
       ctx.fill();
     },
     []
@@ -193,361 +246,433 @@ export default function GamePage() {
     if (!canvas || !ctx || !g.running) return;
 
     g.frame++;
-    g.waveOffset += g.speed * 0.5;
+    g.wavePhase += g.speed;
+    g.dist += g.speed;
 
-    // Update speed (increases over time)
-    g.speed = OBSTACLE_SPEED_START + g.score * 0.15;
+    // Speed ramp
+    g.speed = 5 + Math.floor(g.score / 5) * 0.5;
+    if (g.speed > 12) g.speed = 12;
 
-    // Physics
-    g.velocity += GRAVITY;
-    g.playerY += g.velocity;
-
-    // Boundaries
-    if (g.playerY < 20) {
-      g.playerY = 20;
-      g.velocity = 0;
+    // Player physics
+    if (!g.grounded) {
+      g.vy += GRAVITY;
+      g.y += g.vy;
+      if (g.y >= GROUND - PLAYER_H) {
+        g.y = GROUND - PLAYER_H;
+        g.vy = 0;
+        g.grounded = true;
+        // Landing splash
+        for (let i = 0; i < 5; i++) {
+          g.splashes.push({
+            x: 100 + PLAYER_W / 2 + (Math.random() - 0.5) * 30,
+            y: GROUND,
+            life: 15 + Math.random() * 10,
+            vx: (Math.random() - 0.5) * 3,
+            vy: -Math.random() * 4 - 1,
+            size: 2 + Math.random() * 3,
+          });
+        }
+      }
     }
-    if (g.playerY > CANVAS_H - 40) {
-      g.playerY = CANVAS_H - 40;
-      g.velocity = 0;
-      // Splash when touching water
-      if (g.frame % 8 === 0) addSplash(60, g.playerY + 20);
+
+    // Spawn rocks
+    if (g.frame % Math.max(70 - g.score * 2, 35) === 0) {
+      const h = 20 + Math.random() * 30;
+      g.rocks.push({ x: W + 20, w: 25 + Math.random() * 20, h });
     }
 
-    // Spawn obstacles
-    const spawnInterval = Math.max(
-      SPAWN_INTERVAL_START - g.score * 2,
-      45
-    );
-    if (g.frame % spawnInterval === 0) {
-      spawnObstacle();
+    // Spawn shells
+    if (g.frame % 50 === 0 && Math.random() > 0.35) {
+      g.shells.push({
+        x: W + 20,
+        y: GROUND - PLAYER_H - 20 - Math.random() * 80,
+        collected: false,
+        bob: Math.random() * Math.PI * 2,
+      });
     }
 
-    // Update obstacles
-    for (let i = g.obstacles.length - 1; i >= 0; i--) {
-      g.obstacles[i].x -= g.speed;
+    // Update rocks
+    for (let i = g.rocks.length - 1; i >= 0; i--) {
+      g.rocks[i].x -= g.speed;
+      if (g.rocks[i].x < -60) g.rocks.splice(i, 1);
+    }
 
-      // Score
-      if (!g.obstacles[i].passed && g.obstacles[i].x + 30 < 60) {
-        g.obstacles[i].passed = true;
+    // Update shells
+    for (let i = g.shells.length - 1; i >= 0; i--) {
+      g.shells[i].x -= g.speed;
+      g.shells[i].bob += 0.08;
+      if (g.shells[i].x < -40) g.shells.splice(i, 1);
+    }
+
+    // Update splashes
+    for (let i = g.splashes.length - 1; i >= 0; i--) {
+      const s = g.splashes[i];
+      s.x += s.vx;
+      s.y += s.vy;
+      s.vy += 0.15;
+      s.life--;
+      if (s.life <= 0) g.splashes.splice(i, 1);
+    }
+
+    // Collision — rocks
+    const px = 100;
+    const py = g.y;
+    for (const r of g.rocks) {
+      if (
+        px + PLAYER_W - 15 > r.x &&
+        px + 15 < r.x + r.w &&
+        py + PLAYER_H > GROUND - r.h
+      ) {
+        g.running = false;
+        if (g.score > g.highScore) {
+          g.highScore = g.score;
+          setHighScore(g.score);
+          try { localStorage.setItem("mo3surf", String(g.score)); } catch {}
+        }
+        setScreen("over");
+        setTip(TIPS[Math.floor(Math.random() * TIPS.length)]);
+        return;
+      }
+    }
+
+    // Collect shells
+    for (const sh of g.shells) {
+      if (sh.collected) continue;
+      const shY = sh.y + Math.sin(sh.bob) * 6;
+      if (
+        px + PLAYER_W - 10 > sh.x &&
+        px + 10 < sh.x + 24 &&
+        py < shY + 24 &&
+        py + PLAYER_H > shY
+      ) {
+        sh.collected = true;
         g.score++;
         setScore(g.score);
-      }
-
-      // Remove off-screen
-      if (g.obstacles[i].x < -60) {
-        g.obstacles.splice(i, 1);
-      }
-    }
-
-    // Update particles
-    for (let i = g.particles.length - 1; i >= 0; i--) {
-      const p = g.particles[i];
-      p.x += p.vx;
-      p.y += p.vy;
-      p.vy += 0.1;
-      p.life--;
-      if (p.life <= 0) g.particles.splice(i, 1);
-    }
-
-    // Collision detection
-    const playerX = 60;
-    const playerR = 14;
-    for (const obs of g.obstacles) {
-      const obsW = 50;
-      if (
-        playerX + playerR > obs.x &&
-        playerX - playerR < obs.x + obsW
-      ) {
-        if (
-          g.playerY - playerR < obs.gapY - OBSTACLE_GAP / 2 ||
-          g.playerY + playerR > obs.gapY + OBSTACLE_GAP / 2
-        ) {
-          // Game over
-          g.running = false;
-          g.gameOver = true;
-          if (g.score > g.highScore) {
-            g.highScore = g.score;
-            setHighScore(g.score);
-            try {
-              localStorage.setItem("surfHighScore", String(g.score));
-            } catch {}
-          }
-          setGameOver(true);
-          return;
+        // Sparkle
+        for (let i = 0; i < 4; i++) {
+          g.splashes.push({
+            x: sh.x + 12,
+            y: shY + 12,
+            life: 12 + Math.random() * 8,
+            vx: (Math.random() - 0.5) * 4,
+            vy: (Math.random() - 0.5) * 4,
+            size: 2 + Math.random() * 2,
+          });
         }
       }
     }
 
     // ---- DRAW ----
-    // Sky gradient
-    const skyGrad = ctx.createLinearGradient(0, 0, 0, CANVAS_H);
-    skyGrad.addColorStop(0, "#0ea5e9");
-    skyGrad.addColorStop(0.5, "#38bdf8");
-    skyGrad.addColorStop(1, "#0284c7");
-    ctx.fillStyle = skyGrad;
-    ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
-
-    // Clouds
-    ctx.fillStyle = "rgba(255,255,255,0.3)";
-    const cloudX1 = ((g.waveOffset * 0.3) % (CANVAS_W + 100)) - 50;
-    const cloudX2 =
-      ((g.waveOffset * 0.2 + 200) % (CANVAS_W + 100)) - 50;
-    ctx.beginPath();
-    ctx.arc(cloudX1, 60, 20, 0, Math.PI * 2);
-    ctx.arc(cloudX1 + 25, 55, 25, 0, Math.PI * 2);
-    ctx.arc(cloudX1 + 50, 60, 18, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(cloudX2, 100, 15, 0, Math.PI * 2);
-    ctx.arc(cloudX2 + 20, 95, 20, 0, Math.PI * 2);
-    ctx.arc(cloudX2 + 40, 100, 15, 0, Math.PI * 2);
-    ctx.fill();
+    // Sky
+    const sky = ctx.createLinearGradient(0, 0, 0, H);
+    sky.addColorStop(0, "#0369a1");
+    sky.addColorStop(0.4, "#0ea5e9");
+    sky.addColorStop(0.7, "#38bdf8");
+    sky.addColorStop(1, "#0284c7");
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, W, H);
 
     // Sun
-    ctx.fillStyle = "#fde047";
+    ctx.fillStyle = "rgba(253,224,71,0.9)";
     ctx.beginPath();
-    ctx.arc(CANVAS_W - 60, 50, 30, 0, Math.PI * 2);
+    ctx.arc(W - 80, 60, 35, 0, Math.PI * 2);
     ctx.fill();
-    ctx.fillStyle = "rgba(253,224,71,0.15)";
+    ctx.fillStyle = "rgba(253,224,71,0.12)";
     ctx.beginPath();
-    ctx.arc(CANVAS_W - 60, 50, 50, 0, Math.PI * 2);
+    ctx.arc(W - 80, 60, 65, 0, Math.PI * 2);
     ctx.fill();
 
-    // Background waves
-    drawWave(ctx, CANVAS_H - 60, 15, "rgba(6,182,212,0.3)", g.waveOffset, 0.8);
-    drawWave(ctx, CANVAS_H - 40, 12, "rgba(6,182,212,0.4)", g.waveOffset, 1.2);
-
-    // Obstacles (coral reefs / rocks)
-    for (const obs of g.obstacles) {
-      const topH = obs.gapY - OBSTACLE_GAP / 2;
-      const botY = obs.gapY + OBSTACLE_GAP / 2;
-
-      // Top obstacle (hanging coral)
-      const topGrad = ctx.createLinearGradient(obs.x, 0, obs.x + 50, 0);
-      topGrad.addColorStop(0, "#dc2626");
-      topGrad.addColorStop(1, "#f87171");
-      ctx.fillStyle = topGrad;
+    // Sun rays
+    ctx.strokeStyle = "rgba(253,224,71,0.08)";
+    ctx.lineWidth = 2;
+    for (let a = 0; a < Math.PI * 2; a += Math.PI / 6) {
       ctx.beginPath();
-      ctx.roundRect(obs.x, 0, 50, topH, [0, 0, 10, 10]);
-      ctx.fill();
-
-      // Coral details on top
-      ctx.fillStyle = "#fca5a5";
-      for (let cy = 10; cy < topH - 10; cy += 20) {
-        ctx.beginPath();
-        ctx.arc(obs.x + 15, cy, 5, 0, Math.PI * 2);
-        ctx.arc(obs.x + 35, cy + 10, 4, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      // Bottom obstacle (rock/coral from below)
-      const botGrad = ctx.createLinearGradient(obs.x, botY, obs.x + 50, CANVAS_H);
-      botGrad.addColorStop(0, "#b45309");
-      botGrad.addColorStop(1, "#92400e");
-      ctx.fillStyle = botGrad;
-      ctx.beginPath();
-      ctx.roundRect(obs.x, botY, 50, CANVAS_H - botY, [10, 10, 0, 0]);
-      ctx.fill();
-
-      // Rock details
-      ctx.fillStyle = "#d97706";
-      for (let cy = botY + 15; cy < CANVAS_H - 10; cy += 20) {
-        ctx.beginPath();
-        ctx.arc(obs.x + 20, cy, 6, 0, Math.PI * 2);
-        ctx.arc(obs.x + 38, cy + 8, 4, 0, Math.PI * 2);
-        ctx.fill();
-      }
+      ctx.moveTo(W - 80 + Math.cos(a + g.frame * 0.005) * 40, 60 + Math.sin(a + g.frame * 0.005) * 40);
+      ctx.lineTo(W - 80 + Math.cos(a + g.frame * 0.005) * 80, 60 + Math.sin(a + g.frame * 0.005) * 80);
+      ctx.stroke();
     }
 
-    // Foreground wave
-    drawWave(ctx, CANVAS_H - 20, 8, "rgba(14,165,233,0.5)", g.waveOffset, 1.5);
+    // Clouds
+    ctx.fillStyle = "rgba(255,255,255,0.25)";
+    const cx1 = ((g.wavePhase * 0.15) % (W + 200)) - 100;
+    const cx2 = ((g.wavePhase * 0.1 + 400) % (W + 200)) - 100;
+    ctx.beginPath();
+    ctx.arc(cx1, 50, 18, 0, Math.PI * 2);
+    ctx.arc(cx1 + 22, 45, 24, 0, Math.PI * 2);
+    ctx.arc(cx1 + 48, 50, 16, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(cx2, 85, 14, 0, Math.PI * 2);
+    ctx.arc(cx2 + 18, 80, 18, 0, Math.PI * 2);
+    ctx.arc(cx2 + 36, 85, 12, 0, Math.PI * 2);
+    ctx.fill();
 
-    // Particles (splash)
-    for (const p of g.particles) {
-      const alpha = p.life / p.maxLife;
-      ctx.fillStyle = `rgba(255,255,255,${alpha * 0.8})`;
+    // Ocean base
+    ctx.fillStyle = "#0284c7";
+    ctx.fillRect(0, GROUND, W, H - GROUND);
+
+    // Waves
+    drawWaves(ctx, g.wavePhase);
+
+    // Rocks
+    for (const r of g.rocks) {
+      // Shadow
+      ctx.fillStyle = "rgba(0,0,0,0.15)";
       ctx.beginPath();
-      ctx.arc(p.x, p.y, p.size * alpha, 0, Math.PI * 2);
+      ctx.ellipse(r.x + r.w / 2, GROUND + 2, r.w / 2 + 4, 4, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Rock body
+      const rGrad = ctx.createLinearGradient(r.x, GROUND - r.h, r.x, GROUND);
+      rGrad.addColorStop(0, "#78716c");
+      rGrad.addColorStop(0.5, "#57534e");
+      rGrad.addColorStop(1, "#44403c");
+      ctx.fillStyle = rGrad;
+      ctx.beginPath();
+      ctx.moveTo(r.x + 2, GROUND);
+      ctx.lineTo(r.x + r.w * 0.15, GROUND - r.h * 0.7);
+      ctx.lineTo(r.x + r.w * 0.4, GROUND - r.h);
+      ctx.lineTo(r.x + r.w * 0.65, GROUND - r.h * 0.85);
+      ctx.lineTo(r.x + r.w - 2, GROUND);
+      ctx.fill();
+
+      // Rock highlight
+      ctx.fillStyle = "rgba(255,255,255,0.12)";
+      ctx.beginPath();
+      ctx.moveTo(r.x + r.w * 0.3, GROUND - r.h * 0.5);
+      ctx.lineTo(r.x + r.w * 0.4, GROUND - r.h);
+      ctx.lineTo(r.x + r.w * 0.55, GROUND - r.h * 0.7);
+      ctx.fill();
+    }
+
+    // Shells
+    for (const sh of g.shells) {
+      if (sh.collected) continue;
+      const shY = sh.y + Math.sin(sh.bob) * 6;
+
+      // Glow
+      ctx.fillStyle = "rgba(253,224,71,0.15)";
+      ctx.beginPath();
+      ctx.arc(sh.x + 12, shY + 12, 16, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Shell body
+      ctx.fillStyle = "#fde047";
+      ctx.strokeStyle = "#ca8a04";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(sh.x + 12, shY + 12, 10, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      // Star pattern
+      ctx.fillStyle = "#fbbf24";
+      ctx.font = "14px serif";
+      ctx.textAlign = "center";
+      ctx.fillText("★", sh.x + 12, shY + 17);
+    }
+
+    // Splash particles
+    for (const s of g.splashes) {
+      const a = s.life / 25;
+      ctx.fillStyle = `rgba(255,255,255,${a * 0.7})`;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.size * (s.life / 25), 0, Math.PI * 2);
       ctx.fill();
     }
 
     // Player
-    drawSurfer(ctx, 60, g.playerY, g.velocity);
+    drawPlayer(ctx, px, g.y, !g.grounded);
 
-    // Score display
-    ctx.fillStyle = "rgba(0,0,0,0.3)";
+    // Spray behind board when grounded
+    if (g.grounded && g.frame % 4 === 0) {
+      g.splashes.push({
+        x: px + 10 + Math.random() * 10,
+        y: GROUND + Math.random() * 5,
+        life: 10 + Math.random() * 8,
+        vx: -1 - Math.random() * 2,
+        vy: -Math.random() * 2,
+        size: 2 + Math.random() * 2,
+      });
+    }
+
+    // HUD
+    ctx.fillStyle = "rgba(0,0,0,0.35)";
     ctx.beginPath();
-    ctx.roundRect(CANVAS_W / 2 - 40, 10, 80, 32, 16);
+    ctx.roundRect(W / 2 - 55, 12, 110, 36, 18);
     ctx.fill();
-    ctx.fillStyle = "#fff";
-    ctx.font = "bold 18px Inter, system-ui, sans-serif";
+    ctx.fillStyle = "#fde047";
+    ctx.font = "bold 13px Inter, system-ui, sans-serif";
     ctx.textAlign = "center";
-    ctx.fillText(`${g.score}`, CANVAS_W / 2, 33);
+    ctx.fillText(`★ ${g.score}`, W / 2 - 18, 35);
+    ctx.fillStyle = "#fff";
+    ctx.fillText(`${Math.floor(g.dist / 50)}m`, W / 2 + 25, 35);
 
     rafRef.current = requestAnimationFrame(gameLoop);
-  }, [drawSurfer, drawWave, addSplash, spawnObstacle]);
-
-  const startGame = useCallback(() => {
-    const g = gameRef.current;
-    g.playerY = 250;
-    g.velocity = 0;
-    g.obstacles = [];
-    g.particles = [];
-    g.score = 0;
-    g.frame = 0;
-    g.running = true;
-    g.gameOver = false;
-    g.speed = OBSTACLE_SPEED_START;
-    setScore(0);
-    setGameOver(false);
-    setStarted(true);
-    rafRef.current = requestAnimationFrame(gameLoop);
-  }, [gameLoop]);
+  }, [drawPlayer, drawWaves]);
 
   const jump = useCallback(() => {
     const g = gameRef.current;
-    if (g.gameOver) {
-      startGame();
-      return;
-    }
     if (!g.running) return;
-    g.velocity = JUMP_FORCE;
-    addSplash(50, g.playerY + 15);
-  }, [startGame, addSplash]);
-
-  // Load high score
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem("surfHighScore");
-      if (saved) {
-        const val = parseInt(saved, 10);
-        gameRef.current.highScore = val;
-        setHighScore(val);
+    if (g.grounded) {
+      g.vy = JUMP_VEL;
+      g.grounded = false;
+      // Jump splash
+      for (let i = 0; i < 6; i++) {
+        g.splashes.push({
+          x: 100 + PLAYER_W / 2 + (Math.random() - 0.5) * 20,
+          y: GROUND,
+          life: 12 + Math.random() * 8,
+          vx: (Math.random() - 0.5) * 4,
+          vy: -Math.random() * 5 - 2,
+          size: 2 + Math.random() * 3,
+        });
       }
-    } catch {}
+    }
   }, []);
 
-  // Draw start screen
+  const startGame = useCallback(() => {
+    const g = gameRef.current;
+    g.y = GROUND - PLAYER_H;
+    g.vy = 0;
+    g.grounded = true;
+    g.rocks = [];
+    g.shells = [];
+    g.splashes = [];
+    g.score = 0;
+    g.dist = 0;
+    g.speed = 5;
+    g.frame = 0;
+    g.running = true;
+    setScore(0);
+    setScreen("play");
+    rafRef.current = requestAnimationFrame(gameLoop);
+  }, [gameLoop]);
+
+  // Draw menu screen
   useEffect(() => {
+    if (screen !== "menu") return;
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
-    if (!canvas || !ctx || started) return;
+    if (!canvas || !ctx) return;
 
-    const skyGrad = ctx.createLinearGradient(0, 0, 0, CANVAS_H);
-    skyGrad.addColorStop(0, "#0ea5e9");
-    skyGrad.addColorStop(0.5, "#38bdf8");
-    skyGrad.addColorStop(1, "#0284c7");
-    ctx.fillStyle = skyGrad;
-    ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
-
-    // Sun
-    ctx.fillStyle = "#fde047";
-    ctx.beginPath();
-    ctx.arc(CANVAS_W - 60, 50, 30, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Waves
-    ctx.fillStyle = "rgba(6,182,212,0.4)";
-    ctx.beginPath();
-    ctx.moveTo(0, CANVAS_H);
-    for (let x = 0; x <= CANVAS_W; x += 4) {
-      ctx.lineTo(x, CANVAS_H - 50 + Math.sin(x * 0.02) * 15);
+    // Background image or gradient
+    if (menuImg) {
+      ctx.drawImage(menuImg, 0, 0, W, H);
+      ctx.fillStyle = "rgba(8,47,73,0.6)";
+      ctx.fillRect(0, 0, W, H);
+    } else {
+      const sky = ctx.createLinearGradient(0, 0, 0, H);
+      sky.addColorStop(0, "#082f49");
+      sky.addColorStop(1, "#0c4a6e");
+      ctx.fillStyle = sky;
+      ctx.fillRect(0, 0, W, H);
     }
-    ctx.lineTo(CANVAS_W, CANVAS_H);
-    ctx.closePath();
-    ctx.fill();
-
-    // Surfer
-    drawSurfer(ctx, CANVAS_W / 2, CANVAS_H / 2 + 20, 0);
 
     // Title
     ctx.fillStyle = "#fff";
-    ctx.font = "bold 28px 'Playfair Display', Georgia, serif";
+    ctx.font = "bold 42px 'Playfair Display', Georgia, serif";
     ctx.textAlign = "center";
-    ctx.fillText("Mo3tasim Surf", CANVAS_W / 2, 160);
+    ctx.fillText("Mo3tasim Surf", W / 2, H / 2 - 50);
 
-    ctx.font = "16px Inter, system-ui, sans-serif";
-    ctx.fillStyle = "rgba(255,255,255,0.8)";
-    ctx.fillText("Tap or press Space to ride!", CANVAS_W / 2, 200);
-  }, [started, drawSurfer]);
+    // Subtitle
+    ctx.font = "18px Inter, system-ui, sans-serif";
+    ctx.fillStyle = "rgba(255,255,255,0.7)";
+    ctx.fillText("Ride the waves of Haifa", W / 2, H / 2 - 15);
 
-  // Keyboard controls
+    // Instruction
+    ctx.fillStyle = "rgba(20,184,166,0.9)";
+    ctx.beginPath();
+    ctx.roundRect(W / 2 - 90, H / 2 + 20, 180, 44, 22);
+    ctx.fill();
+    ctx.fillStyle = "#fff";
+    ctx.font = "bold 16px Inter, system-ui, sans-serif";
+    ctx.fillText("Tap to Start", W / 2, H / 2 + 47);
+
+    // High score
+    if (highScore > 0) {
+      ctx.fillStyle = "rgba(253,224,71,0.8)";
+      ctx.font = "14px Inter, system-ui, sans-serif";
+      ctx.fillText(`Best: ★ ${highScore}`, W / 2, H / 2 + 90);
+    }
+
+    // Controls hint
+    ctx.fillStyle = "rgba(255,255,255,0.4)";
+    ctx.font = "13px Inter, system-ui, sans-serif";
+    ctx.fillText("Tap / Space to jump over rocks", W / 2, H / 2 + 120);
+    ctx.fillText("Collect ★ shells for points", W / 2, H / 2 + 140);
+  }, [screen, menuImg, highScore]);
+
+  // Keyboard
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.code === "Space" || e.code === "ArrowUp") {
         e.preventDefault();
-        if (!started || gameOver) startGame();
-        else jump();
+        if (screen === "play") jump();
+        else startGame();
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [started, gameOver, startGame, jump]);
+  }, [screen, jump, startGame]);
 
-  // Cleanup
-  useEffect(() => {
-    return () => cancelAnimationFrame(rafRef.current);
-  }, []);
+  // Cleanup RAF
+  useEffect(() => () => cancelAnimationFrame(rafRef.current), []);
+
+  const handleTap = () => {
+    if (screen === "play") jump();
+    else startGame();
+  };
 
   return (
-    <div className="min-h-screen bg-ocean-950 flex flex-col items-center justify-center px-4 py-8">
-      <div className="text-center mb-6">
-        <h1
-          className="text-3xl md:text-4xl font-bold text-white mb-2"
-          style={{ fontFamily: "var(--font-heading)" }}
-        >
-          Mo3tasim Surf
-        </h1>
-        <p className="text-white/60 text-sm">
-          Dodge the coral reefs and ride the waves!
-        </p>
-      </div>
-
-      <div className="relative">
+    <div className="min-h-screen bg-ocean-950 flex flex-col items-center justify-center px-4 py-6">
+      <div className="w-full max-w-3xl">
         <canvas
           ref={canvasRef}
-          width={CANVAS_W}
-          height={CANVAS_H}
-          className="rounded-2xl shadow-2xl border-2 border-white/10 max-w-full"
-          style={{ touchAction: "none", maxHeight: "70vh", aspectRatio: `${CANVAS_W}/${CANVAS_H}` }}
-          onClick={() => {
-            if (!started || gameOver) startGame();
-            else jump();
-          }}
+          width={W}
+          height={H}
+          className="w-full rounded-2xl shadow-2xl border-2 border-white/10 cursor-pointer"
+          style={{ touchAction: "none", aspectRatio: `${W}/${H}` }}
+          onClick={handleTap}
           onTouchStart={(e) => {
             e.preventDefault();
-            if (!started || gameOver) startGame();
-            else jump();
+            handleTap();
           }}
         />
 
-        {gameOver && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 rounded-2xl">
-            <p className="text-white text-3xl font-bold mb-2">Wipeout!</p>
-            <p className="text-teal-300 text-xl mb-1">Score: {score}</p>
-            {highScore > 0 && (
-              <p className="text-yellow-300 text-sm mb-4">
-                Best: {highScore}
-              </p>
+        {screen === "over" && (
+          <div className="mt-6 text-center">
+            <p className="text-white text-2xl font-bold mb-1">Wipeout!</p>
+            <p className="text-teal-400 text-lg">
+              ★ {score} shells &middot; {Math.floor(gameRef.current.dist / 50)}m surfed
+            </p>
+            {score >= highScore && score > 0 && (
+              <p className="text-yellow-400 text-sm mt-1">New best!</p>
             )}
-            <p className="text-white/60 text-sm">Tap to ride again</p>
+            <p className="text-white/50 text-sm italic mt-3 max-w-md mx-auto">
+              {tip}
+            </p>
+            <button
+              onClick={startGame}
+              className="mt-4 px-8 py-3 bg-teal-500 text-white font-semibold rounded-full hover:bg-teal-400 transition-all"
+            >
+              Ride Again
+            </button>
           </div>
         )}
-      </div>
 
-      <div className="flex items-center gap-6 mt-6 text-white/70 text-sm">
-        <span>Score: <span className="text-teal-400 font-bold">{score}</span></span>
-        {highScore > 0 && (
-          <span>Best: <span className="text-yellow-400 font-bold">{highScore}</span></span>
+        {screen === "menu" && (
+          <p className="text-center text-white/40 text-xs mt-4">
+            A mini game by Moatasem Akash
+          </p>
         )}
       </div>
 
       <Link
         href="/"
-        className="mt-8 px-6 py-2.5 border border-white/20 text-white/70 rounded-full text-sm hover:border-teal-400 hover:text-teal-400 transition-all"
+        className="mt-6 text-white/40 text-sm hover:text-teal-400 transition-colors"
       >
-        Back to Home
+        &larr; Back to site
       </Link>
     </div>
   );
