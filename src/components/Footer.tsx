@@ -93,10 +93,17 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-16 pt-8 border-t border-ocean-800 text-center">
+        <div className="mt-16 pt-8 border-t border-ocean-800 flex items-center justify-between">
           <p className="text-ocean-400 text-sm">
             &copy; {new Date().getFullYear()} Moatasem Akash. {t.footer.rights}
           </p>
+          <Link
+            href="/game"
+            className="text-ocean-600 hover:text-teal-400 transition-colors text-lg"
+            title="Play Mo3tasim Surf!"
+          >
+            🏄
+          </Link>
         </div>
       </div>
     </footer>
