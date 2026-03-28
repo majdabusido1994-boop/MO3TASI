@@ -25,6 +25,7 @@ export default function Navbar() {
     { href: "/philosophy", label: t.nav.philosophy },
     { href: "/blog", label: t.nav.blog },
     { href: "/contact", label: t.nav.contact },
+    { href: "/game", label: "🏄 Surf Game" },
   ];
 
   return (
