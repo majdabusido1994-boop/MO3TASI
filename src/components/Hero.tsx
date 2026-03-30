@@ -53,7 +53,7 @@ export default function Hero() {
         preload="auto"
         className="absolute inset-0 w-full h-full object-cover"
       >
-        <source src="/videos/ocean-surf.mp4" type="video/mp4" />
+        <source src="/videos/surf-clip-1.mp4" type="video/mp4" />
       </video>
 
       {/* Gradient Overlay */}

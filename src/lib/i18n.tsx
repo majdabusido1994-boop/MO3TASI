@@ -24,6 +24,12 @@ interface ServiceDetail {
   description: string;
   benefits: string[];
   audience: string;
+  image?: string;
+  recovery?: {
+    title: string;
+    description: string;
+    benefits: string[];
+  };
 }
 
 export interface Dictionary {
@@ -61,7 +67,7 @@ export interface Dictionary {
   services: {
     title: string;
     subtitle: string;
-    therapy: ServiceDetail;
+    training: ServiceDetail;
     massage: ServiceDetail;
     surf: ServiceDetail;
     bookNow: string;

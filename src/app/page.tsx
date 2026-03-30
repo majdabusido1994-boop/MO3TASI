@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
-import { FaHeartbeat, FaHandsHelping, FaWater } from "react-icons/fa";
+import { FaDumbbell, FaHandsHelping, FaWater } from "react-icons/fa";
 import Hero from "@/components/Hero";
 import SectionHeading from "@/components/SectionHeading";
 import ServiceCard from "@/components/ServiceCard";
@@ -14,14 +14,14 @@ export default function Home() {
 
   const services = [
     {
-      title: t.services.therapy.title,
-      description: t.services.therapy.description,
-      icon: FaHeartbeat,
-    },
-    {
       title: t.services.massage.title,
       description: t.services.massage.description,
       icon: FaHandsHelping,
+    },
+    {
+      title: t.services.training.title,
+      description: t.services.training.description,
+      icon: FaDumbbell,
     },
     {
       title: t.services.surf.title,
@@ -56,6 +56,24 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Photo Gallery Strip */}
+      <section className="py-4 overflow-hidden">
+        <div className="flex gap-4 animate-wave">
+          {[
+            "/images/surf-blue-sky.jpg",
+            "/images/services-massage.jpg",
+            "/images/surf-teaching.jpg",
+            "/images/portrait-board.jpg",
+            "/images/surf-teal-wave.jpg",
+            "/images/sup-calm.jpg",
+          ].map((src) => (
+            <div key={src} className="flex-shrink-0 w-64 h-44 rounded-xl overflow-hidden">
+              <img src={src} alt="" className="w-full h-full object-cover" loading="lazy" />
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* Services Preview */}
       <section className="py-24 lg:py-32 px-6 bg-gray-50">
         <div className="max-w-7xl mx-auto">
@@ -68,7 +86,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Philosophy Quote */}
+      {/* Quote */}
       <section className="py-24 lg:py-32 px-6 bg-ocean-950 relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-teal-400 blur-3xl" />

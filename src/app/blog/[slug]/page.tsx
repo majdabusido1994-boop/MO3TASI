@@ -4,7 +4,6 @@ export function generateStaticParams() {
   return [
     { slug: "listening-to-the-body" },
     { slug: "why-i-surf-longboard" },
-    { slug: "fatherhood-and-presence" },
   ];
 }
 

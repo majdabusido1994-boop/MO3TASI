@@ -50,18 +50,18 @@ export default function AboutPage() {
               <div className="relative">
                 <div className="rounded-2xl overflow-hidden shadow-xl">
                   <Image
-                    src="/images/about-2.jpg"
-                    alt="Moatasem Akash longboard surfing"
+                    src="/images/portrait-board.jpg"
+                    alt="Moatasem Akash with longboard"
                     width={600}
-                    height={450}
+                    height={800}
                     className="w-full h-auto object-cover"
                     priority
                   />
                 </div>
                 <div className="absolute -bottom-6 -right-6 rounded-xl overflow-hidden shadow-lg w-40 h-40 border-4 border-white hidden md:block">
                   <Image
-                    src="/images/about-1.jpg"
-                    alt="Moatasem surfing a wave"
+                    src="/images/surf-bw-action.jpg"
+                    alt="Moatasem surfing"
                     width={160}
                     height={160}
                     className="w-full h-full object-cover"
@@ -110,8 +110,8 @@ export default function AboutPage() {
               <div className="grid grid-cols-2 gap-3">
                 <div className="rounded-2xl overflow-hidden shadow-lg">
                   <Image
-                    src="/images/about-3.jpg"
-                    alt="Moatasem riding a wave"
+                    src="/images/surf-blue-sky.jpg"
+                    alt="Moatasem surfing blue sky"
                     width={300}
                     height={400}
                     className="w-full h-64 object-cover"
@@ -119,8 +119,26 @@ export default function AboutPage() {
                 </div>
                 <div className="rounded-2xl overflow-hidden shadow-lg mt-8">
                   <Image
-                    src="/images/services-therapy.jpg"
-                    alt="Moatasem on the ocean"
+                    src="/images/wetsuit-field.jpg"
+                    alt="Moatasem with board"
+                    width={300}
+                    height={400}
+                    className="w-full h-64 object-cover"
+                  />
+                </div>
+                <div className="rounded-2xl overflow-hidden shadow-lg">
+                  <Image
+                    src="/images/surf-teaching.jpg"
+                    alt="Moatasem teaching surf"
+                    width={300}
+                    height={400}
+                    className="w-full h-64 object-cover"
+                  />
+                </div>
+                <div className="rounded-2xl overflow-hidden shadow-lg mt-8">
+                  <Image
+                    src="/images/nazare-cliff.jpg"
+                    alt="Moatasem at the coast"
                     width={300}
                     height={400}
                     className="w-full h-64 object-cover"
