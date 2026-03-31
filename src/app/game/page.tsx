@@ -837,22 +837,88 @@ export default function GamePage() {
     return () => window.removeEventListener("keydown", onKey);
   }, [screen, jump, startGame]);
 
+  // Leaderboard state
+  const [leaderboard, setLeaderboard] = useState<{ name: string; score: number; rank: number; discount?: number }[]>([]);
+  const [showForm, setShowForm] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [playerRank, setPlayerRank] = useState<number | null>(null);
+  const [awardedDiscount, setAwardedDiscount] = useState<number | null>(null);
+  const [formData, setFormData] = useState({ name: "", mobile: "", email: "" });
+
+  const fetchLeaderboard = useCallback(async () => {
+    try {
+      const res = await fetch("/.netlify/functions/get-scores");
+      const data = await res.json();
+      if (data.leaderboard) setLeaderboard(data.leaderboard);
+    } catch {}
+  }, []);
+
+  // Fetch on mount and when tab becomes visible
+  useEffect(() => {
+    fetchLeaderboard();
+    const onVisible = () => { if (document.visibilityState === "visible") fetchLeaderboard(); };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => document.removeEventListener("visibilitychange", onVisible);
+  }, [fetchLeaderboard]);
+
+  // Show form when game ends with score > 0
+  useEffect(() => {
+    if (screen === "over" && score > 0) {
+      setShowForm(true);
+      setSubmitted(false);
+      setPlayerRank(null);
+      setAwardedDiscount(null);
+    }
+  }, [screen, score]);
+
+  const submitScore = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (submitting || submitted) return;
+    setSubmitting(true);
+    try {
+      const res = await fetch("/.netlify/functions/submit-score", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: formData.name,
+          mobile: formData.mobile,
+          email: formData.email,
+          score,
+          distance: Math.floor(gameRef.current.dist / 50),
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setSubmitted(true);
+        setShowForm(false);
+        setPlayerRank(data.playerRank);
+        setAwardedDiscount(data.discount);
+        if (data.leaderboard) setLeaderboard(data.leaderboard);
+      }
+    } catch {}
+    setSubmitting(false);
+  };
+
   useEffect(() => () => cancelAnimationFrame(rafRef.current), []);
 
   const handleTap = () => {
     if (screen === "play") jump();
-    else startGame();
+    else if (screen === "menu") startGame();
   };
 
+  const RANK_COLORS = ["text-yellow-400", "text-gray-300", "text-amber-600"];
+  const RANK_LABELS = ["1st", "2nd", "3rd"];
+
   return (
-    <div className="min-h-screen bg-ocean-950 flex flex-col items-center justify-center px-4 py-6 relative overflow-hidden">
+    <div className="min-h-screen bg-ocean-950 flex flex-col items-center px-4 py-6 relative overflow-hidden">
       {/* Ambient background effects */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-teal-500/5 rounded-full blur-3xl animate-pulse" />
         <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-ocean-400/5 rounded-full blur-3xl animate-pulse [animation-delay:1.5s]" />
       </div>
 
-      <div className="relative w-full max-w-3xl">
+      <div className="relative w-full max-w-3xl mt-8">
         {/* Title bar */}
         <div className="flex items-center justify-between mb-4 px-2">
           <Link
@@ -891,7 +957,7 @@ export default function GamePage() {
         {/* Game over panel */}
         {screen === "over" && (
           <div className="mt-6 text-center animate-fade-in">
-            <div className="inline-block bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl px-8 py-6">
+            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl px-6 py-6 max-w-md mx-auto">
               <p className="text-white text-2xl font-bold mb-1 game-over-title">Wipeout!</p>
               <div className="flex items-center justify-center gap-4 mt-3">
                 <div className="text-center">
@@ -904,16 +970,81 @@ export default function GamePage() {
                   <p className="text-white/40 text-xs mt-0.5">surfed</p>
                 </div>
               </div>
+
               {score >= highScore && score > 0 && (
                 <p className="text-yellow-400 text-sm mt-3 animate-pulse font-medium">New personal best!</p>
               )}
-              <p className="text-white/40 text-xs italic mt-4 max-w-sm mx-auto leading-relaxed">
+
+              {/* Score submission form */}
+              {showForm && !submitted && score > 0 && (
+                <form onSubmit={submitScore} className="mt-5 space-y-3 text-left">
+                  <p className="text-white/60 text-xs text-center mb-3">Submit your score to the leaderboard. Top 3 win massage discounts!</p>
+                  <input
+                    type="text"
+                    placeholder="Your name"
+                    required
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white text-sm placeholder-white/30 focus:outline-none focus:border-teal-400/50 transition-colors"
+                  />
+                  <input
+                    type="tel"
+                    placeholder="Mobile / WhatsApp"
+                    required
+                    value={formData.mobile}
+                    onChange={(e) => setFormData({ ...formData, mobile: e.target.value })}
+                    className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white text-sm placeholder-white/30 focus:outline-none focus:border-teal-400/50 transition-colors"
+                  />
+                  <input
+                    type="email"
+                    placeholder="Email address"
+                    required
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white text-sm placeholder-white/30 focus:outline-none focus:border-teal-400/50 transition-colors"
+                  />
+                  <div className="flex gap-3 pt-1">
+                    <button
+                      type="submit"
+                      disabled={submitting}
+                      className="flex-1 px-6 py-2.5 bg-teal-500 text-white font-semibold rounded-full hover:bg-teal-400 transition-all cursor-pointer text-sm disabled:opacity-50"
+                    >
+                      {submitting ? "Submitting..." : "Submit Score"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setShowForm(false); setSubmitted(true); }}
+                      className="px-4 py-2.5 text-white/40 hover:text-white/60 text-sm transition-colors cursor-pointer"
+                    >
+                      Skip
+                    </button>
+                  </div>
+                </form>
+              )}
+
+              {/* After submission — rank result */}
+              {submitted && playerRank && (
+                <div className="mt-4">
+                  <p className="text-white/70 text-sm">
+                    You ranked <span className={`font-bold ${playerRank <= 3 ? RANK_COLORS[playerRank - 1] : "text-white"}`}>#{playerRank}</span> on the leaderboard!
+                  </p>
+                  {awardedDiscount && (
+                    <div className="mt-3 inline-block bg-gradient-to-r from-yellow-400/20 to-warm-400/20 border border-yellow-400/30 rounded-xl px-5 py-3">
+                      <p className="text-yellow-400 font-bold text-lg">{awardedDiscount}% OFF</p>
+                      <p className="text-white/60 text-xs mt-0.5">Your next massage session!</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <p className="text-white/30 text-xs italic mt-4 max-w-sm mx-auto leading-relaxed">
                 {tip}
               </p>
+
               <button
                 type="button"
-                onClick={startGame}
-                className="mt-5 px-8 py-3 bg-teal-500 text-white font-semibold rounded-full hover:bg-teal-400 transition-all cursor-pointer animate-glow"
+                onClick={() => { setShowForm(false); setSubmitted(false); startGame(); }}
+                className="mt-4 px-8 py-3 bg-teal-500 text-white font-semibold rounded-full hover:bg-teal-400 transition-all cursor-pointer animate-glow text-sm"
               >
                 Ride Again
               </button>
@@ -939,6 +1070,63 @@ export default function GamePage() {
             </div>
           </div>
         )}
+
+        {/* Leaderboard */}
+        <div className="mt-8 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-white font-bold text-lg heading-font">Leaderboard</h3>
+            <div className="flex gap-2">
+              {[20, 10, 5].map((d, i) => (
+                <span key={d} className={`text-[10px] px-2 py-0.5 rounded-full border ${i === 0 ? "border-yellow-400/30 text-yellow-400/70 bg-yellow-400/5" : i === 1 ? "border-gray-300/30 text-gray-300/70 bg-gray-300/5" : "border-amber-600/30 text-amber-600/70 bg-amber-600/5"}`}>
+                  {RANK_LABELS[i]} {d}% off
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {leaderboard.length === 0 ? (
+            <p className="text-white/30 text-sm text-center py-6">No scores yet. Be the first to play!</p>
+          ) : (
+            <div className="space-y-1">
+              {leaderboard.map((entry) => (
+                <div
+                  key={`${entry.rank}-${entry.name}`}
+                  className={`flex items-center gap-3 px-4 py-2.5 rounded-xl transition-colors ${entry.rank <= 3 ? "bg-white/5" : "hover:bg-white/3"}`}
+                >
+                  {/* Rank */}
+                  <span className={`w-8 text-center font-bold text-sm ${entry.rank <= 3 ? RANK_COLORS[entry.rank - 1] : "text-white/40"}`}>
+                    {entry.rank <= 3 ? (
+                      <span className="text-lg">{entry.rank === 1 ? "🥇" : entry.rank === 2 ? "🥈" : "🥉"}</span>
+                    ) : (
+                      `#${entry.rank}`
+                    )}
+                  </span>
+
+                  {/* Name */}
+                  <span className={`flex-1 text-sm font-medium ${entry.rank <= 3 ? "text-white" : "text-white/70"}`}>
+                    {entry.name}
+                  </span>
+
+                  {/* Discount badge */}
+                  {entry.discount && (
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${entry.rank === 1 ? "bg-yellow-400/15 text-yellow-400" : entry.rank === 2 ? "bg-gray-300/15 text-gray-300" : "bg-amber-600/15 text-amber-500"}`}>
+                      {entry.discount}% OFF
+                    </span>
+                  )}
+
+                  {/* Score */}
+                  <span className={`text-sm font-bold tabular-nums ${entry.rank <= 3 ? "text-yellow-400" : "text-white/50"}`}>
+                    ★ {entry.score}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <p className="text-white/20 text-[10px] text-center mt-4">
+            Top 3 players earn massage discounts. Discounts valid as long as you hold your rank!
+          </p>
+        </div>
       </div>
     </div>
   );
