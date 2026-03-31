@@ -126,3 +126,132 @@ html {
 .animate-wave {
   animation: wave 6s ease-in-out infinite;
 }
+
+/* Marquee — 21st.dev */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(calc(-100% - var(--gap))); }
+}
+@keyframes marquee-vertical {
+  from { transform: translateY(0); }
+  to { transform: translateY(calc(-100% - var(--gap))); }
+}
+.animate-marquee {
+  animation: marquee var(--duration) linear infinite;
+}
+.animate-marquee-vertical {
+  animation: marquee-vertical var(--duration) linear infinite;
+}
+
+/* Glow pulse for CTA */
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(20, 184, 166, 0.15); }
+  50% { box-shadow: 0 0 40px rgba(20, 184, 166, 0.3); }
+}
+.animate-glow {
+  animation: glow-pulse 3s ease-in-out infinite;
+}
+
+/* Video section overlay */
+.video-section-overlay {
+  background: linear-gradient(
+    180deg,
+    rgba(8, 47, 73, 0.8) 0%,
+    rgba(8, 47, 73, 0.6) 50%,
+    rgba(8, 47, 73, 0.85) 100%
+  );
+}
+
+/* Massage section warm overlay */
+.massage-section-overlay {
+  background: linear-gradient(
+    135deg,
+    rgba(30, 15, 10, 0.85) 0%,
+    rgba(40, 20, 12, 0.75) 40%,
+    rgba(25, 15, 8, 0.88) 100%
+  );
+}
+
+/* Warm glow pulse for massage CTA */
+@keyframes glow-pulse-warm {
+  0%, 100% { box-shadow: 0 0 20px rgba(251, 146, 60, 0.2); }
+  50% { box-shadow: 0 0 40px rgba(251, 146, 60, 0.4); }
+}
+.animate-glow-warm {
+  animation: glow-pulse-warm 3s ease-in-out infinite;
+}
+
+/* Game canvas */
+.game-canvas {
+  touch-action: none;
+  aspect-ratio: 800 / 400;
+}
+
+/* Fade in animation */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+  animation: fade-in 0.4s ease-out;
+}
+
+/* Game over title */
+.game-over-title {
+  font-family: var(--font-heading);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Gradient text utility */
+.text-gradient-teal {
+  background: linear-gradient(135deg, #14b8a6 0%, #0ea5e9 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Trust badge bar */
+.trust-bar {
+  background: linear-gradient(90deg, rgba(20,184,166,0.05) 0%, rgba(14,165,233,0.08) 50%, rgba(20,184,166,0.05) 100%);
+}
+
+/* Service card hover lift */
+.card-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px -12px rgba(0,0,0,0.1);
+}
+
+/* Testimonial quote mark */
+.quote-mark::before {
+  content: "\201C";
+  font-size: 4rem;
+  line-height: 1;
+  position: absolute;
+  top: -0.5rem;
+  left: 0.5rem;
+  color: rgba(20,184,166,0.15);
+  font-family: var(--font-heading);
+}
+
+/* Section divider gradient line */
+.section-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(20,184,166,0.3) 50%, transparent 100%);
+}
+
+/* Heading font utility */
+.heading-font {
+  font-family: var(--font-heading);
+}

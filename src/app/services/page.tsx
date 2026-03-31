@@ -59,6 +59,169 @@ export default function ServicesPage() {
           {services.map((service, i) => {
             const Icon = service.icon;
             const isEven = i % 2 === 0;
+            const isSurf = i === 2;
+
+            // Surf section gets a cinematic video background
+            if (isSurf) {
+              return (
+                <motion.div
+                  key={service.title}
+                  initial={{ opacity: 0, y: 40 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-100px" }}
+                  transition={{ duration: 0.7 }}
+                  className="relative rounded-3xl overflow-hidden"
+                >
+                  {/* Video Background */}
+                  <video
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    preload="auto"
+                    className="absolute inset-0 w-full h-full object-cover"
+                  >
+                    <source src="/videos/surf-clip-1.mp4" type="video/mp4" />
+                  </video>
+                  <div className="absolute inset-0 video-section-overlay" />
+
+                  <div className="relative z-10 py-20 px-8 md:px-16 max-w-3xl mx-auto text-center">
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-teal-500/20 border border-teal-400/30 mb-6">
+                      <Icon className="text-teal-300 text-2xl" />
+                    </div>
+                    <h2
+                      className="text-3xl md:text-4xl font-bold text-white mb-4"
+                      style={{ fontFamily: "var(--font-heading)" }}
+                    >
+                      {service.title}
+                    </h2>
+                    <p className="text-white/80 leading-relaxed mb-8 text-lg">{service.description}</p>
+
+                    <ul className="space-y-3 mb-8 text-left max-w-md mx-auto">
+                      {service.benefits.map((benefit: string) => (
+                        <li key={benefit} className="flex items-start gap-3">
+                          <FaCheck className="text-teal-300 mt-1 flex-shrink-0 text-sm" />
+                          <span className="text-white/90 text-sm">{benefit}</span>
+                        </li>
+                      ))}
+                    </ul>
+
+                    <p className="text-teal-200/70 text-sm italic mb-8">{service.audience}</p>
+
+                    <Link
+                      href="/booking"
+                      className="inline-flex px-8 py-3.5 bg-teal-500 text-white font-semibold rounded-full hover:bg-teal-400 transition-all duration-300 animate-glow text-sm tracking-wide cursor-pointer"
+                    >
+                      {t.services.bookNow}
+                    </Link>
+                  </div>
+                </motion.div>
+              );
+            }
+
+            // Massage section gets a warm, premium treatment
+            const isMassage = i === 0;
+            if (isMassage) {
+              return (
+                <motion.div
+                  key={service.title}
+                  initial={{ opacity: 0, y: 40 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-100px" }}
+                  transition={{ duration: 0.7 }}
+                  className="relative rounded-3xl overflow-hidden"
+                >
+                  {/* Full-bleed massage image background */}
+                  <img
+                    src={service.image}
+                    alt={service.title}
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 massage-section-overlay" />
+
+                  {/* Warm decorative glow */}
+                  <div className="absolute top-0 right-0 w-80 h-80 bg-warm-300/10 rounded-full blur-3xl" />
+                  <div className="absolute bottom-0 left-0 w-64 h-64 bg-teal-400/10 rounded-full blur-3xl" />
+
+                  <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center p-8 md:p-16">
+                    {/* Left: icon + title */}
+                    <div>
+                      <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-warm-300/20 border border-warm-200/30 mb-6">
+                        <Icon className="text-warm-200 text-2xl" />
+                      </div>
+                      <h2
+                        className="text-3xl md:text-4xl font-bold text-white mb-4"
+                        style={{ fontFamily: "var(--font-heading)" }}
+                      >
+                        {service.title}
+                      </h2>
+                      <p className="text-white/80 leading-relaxed mb-6 text-lg">{service.description}</p>
+                      <p className="text-warm-200/70 text-sm italic mb-6">{service.audience}</p>
+                    </div>
+
+                    {/* Right: benefits + recovery + CTA */}
+                    <div>
+                      <ul className="space-y-3 mb-6">
+                        {service.benefits.map((benefit: string) => (
+                          <li key={benefit} className="flex items-start gap-3">
+                            <FaCheck className="text-warm-300 mt-1 flex-shrink-0 text-sm" />
+                            <span className="text-white/90 text-sm">{benefit}</span>
+                          </li>
+                        ))}
+                      </ul>
+
+                      {/* Massage Recovery expandable */}
+                      {"recovery" in service && t.services.massage.recovery && (
+                        <div className="mb-6">
+                          <button
+                            onClick={() => setShowRecovery(!showRecovery)}
+                            className="flex items-center gap-2 text-warm-200 font-medium text-sm hover:text-warm-100 transition-colors cursor-pointer"
+                          >
+                            <FaChevronDown
+                              className={`transition-transform duration-300 ${showRecovery ? "rotate-180" : ""}`}
+                            />
+                            {t.services.massage.recovery.title}
+                          </button>
+                          <AnimatePresence>
+                            {showRecovery && (
+                              <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: "auto", opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{ duration: 0.3 }}
+                                className="overflow-hidden"
+                              >
+                                <div className="mt-4 p-5 bg-white/10 rounded-xl border border-white/10 backdrop-blur-sm">
+                                  <p className="text-white/80 text-sm leading-relaxed mb-4">
+                                    {t.services.massage.recovery.description}
+                                  </p>
+                                  <ul className="space-y-2">
+                                    {t.services.massage.recovery.benefits.map((b: string) => (
+                                      <li key={b} className="flex items-start gap-2">
+                                        <FaCheck className="text-warm-300 mt-1 flex-shrink-0 text-xs" />
+                                        <span className="text-white/90 text-sm">{b}</span>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+                      )}
+
+                      <Link
+                        href="/booking"
+                        className="inline-flex px-8 py-3.5 bg-warm-400 text-white font-semibold rounded-full hover:bg-warm-300 transition-all duration-300 animate-glow-warm text-sm tracking-wide cursor-pointer"
+                      >
+                        {t.services.bookNow}
+                      </Link>
+                    </div>
+                  </div>
+                </motion.div>
+              );
+            }
+
             return (
               <motion.div
                 key={service.title}
@@ -93,7 +256,6 @@ export default function ServicesPage() {
                     </h2>
                     <p className="text-ocean-600 leading-relaxed mb-6">{service.description}</p>
 
-                    {/* Benefits */}
                     <ul className="space-y-3 mb-6">
                       {service.benefits.map((benefit: string) => (
                         <li key={benefit} className="flex items-start gap-3">
@@ -103,52 +265,11 @@ export default function ServicesPage() {
                       ))}
                     </ul>
 
-                    {/* Audience */}
                     <p className="text-ocean-500 text-sm italic mb-6">{service.audience}</p>
-
-                    {/* Massage Recovery expandable */}
-                    {"recovery" in service && t.services.massage.recovery && (
-                      <div className="mb-6">
-                        <button
-                          onClick={() => setShowRecovery(!showRecovery)}
-                          className="flex items-center gap-2 text-teal-600 font-medium text-sm hover:text-teal-700 transition-colors cursor-pointer"
-                        >
-                          <FaChevronDown
-                            className={`transition-transform duration-300 ${showRecovery ? "rotate-180" : ""}`}
-                          />
-                          {t.services.massage.recovery.title}
-                        </button>
-                        <AnimatePresence>
-                          {showRecovery && (
-                            <motion.div
-                              initial={{ height: 0, opacity: 0 }}
-                              animate={{ height: "auto", opacity: 1 }}
-                              exit={{ height: 0, opacity: 0 }}
-                              transition={{ duration: 0.3 }}
-                              className="overflow-hidden"
-                            >
-                              <div className="mt-4 p-5 bg-teal-50 rounded-xl border border-teal-100">
-                                <p className="text-ocean-600 text-sm leading-relaxed mb-4">
-                                  {t.services.massage.recovery.description}
-                                </p>
-                                <ul className="space-y-2">
-                                  {t.services.massage.recovery.benefits.map((b: string) => (
-                                    <li key={b} className="flex items-start gap-2">
-                                      <FaCheck className="text-teal-500 mt-1 flex-shrink-0 text-xs" />
-                                      <span className="text-ocean-700 text-sm">{b}</span>
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </div>
-                    )}
 
                     <Link
                       href="/booking"
-                      className="inline-flex px-8 py-3.5 bg-teal-500 text-white font-semibold rounded-full hover:bg-teal-600 transition-all duration-300 hover:shadow-lg hover:shadow-teal-500/25 text-sm tracking-wide"
+                      className="inline-flex px-8 py-3.5 bg-teal-500 text-white font-semibold rounded-full hover:bg-teal-600 transition-all duration-300 hover:shadow-lg hover:shadow-teal-500/25 text-sm tracking-wide cursor-pointer"
                     >
                       {t.services.bookNow}
                     </Link>

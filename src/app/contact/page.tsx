@@ -100,25 +100,8 @@ export default function ContactPage() {
               })}
             </div>
 
-            {/* Google Maps - Haifa */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.7, delay: 0.3 }}
-              className="mt-8 rounded-2xl overflow-hidden shadow-sm border border-gray-100"
-            >
-              <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d53896.63498692855!2d34.95!3d32.8!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x151dba0ccd4e77f1%3A0x2bcf6e72e7de3e5!2sHaifa%2C%20Israel!5e0!3m2!1sen!2s!4v1"
-                width="100%"
-                height="300"
-                allowFullScreen
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                title="Moatasem Akash - Haifa, Israel"
-                className="w-full border-0"
-              />
-            </motion.div>
+            {/* Decorative wave divider */}
+            <div className="mt-8 h-1 w-24 mx-auto bg-gradient-to-r from-teal-400 to-ocean-400 rounded-full" />
           </div>
 
           {/* Contact Form */}

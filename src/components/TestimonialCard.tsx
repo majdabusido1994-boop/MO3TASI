@@ -16,8 +16,11 @@ export default function TestimonialCard({ name, text, role, index }: Testimonial
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.6, delay: index * 0.15 }}
-      className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100"
+      className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 card-lift relative"
     >
+      {/* Quote mark */}
+      <div className="quote-mark relative" />
+
       <div className="flex gap-1 mb-4">
         {[...Array(5)].map((_, i) => (
           <svg key={i} className="w-4 h-4 text-warm-400" fill="currentColor" viewBox="0 0 20 20">
@@ -26,9 +29,14 @@ export default function TestimonialCard({ name, text, role, index }: Testimonial
         ))}
       </div>
       <p className="text-ocean-700 text-sm leading-relaxed mb-6 italic">&ldquo;{text}&rdquo;</p>
-      <div>
-        <p className="font-semibold text-ocean-900 text-sm">{name}</p>
-        <p className="text-ocean-500 text-xs">{role}</p>
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-teal-400 to-ocean-500 flex items-center justify-center text-white font-bold text-sm">
+          {name.charAt(0)}
+        </div>
+        <div>
+          <p className="font-semibold text-ocean-900 text-sm">{name}</p>
+          <p className="text-ocean-500 text-xs">{role}</p>
+        </div>
       </div>
     </motion.div>
   );

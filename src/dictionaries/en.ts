@@ -10,13 +10,13 @@ const en = {
   },
   hero: {
     name: "Moatasem Akash",
-    tagline: "Sports massage, recovery & surf coaching in Haifa",
+    tagline: "Sports massage, recovery & surf coaching worldwide",
     cta1: "Book a Session",
     cta2: "Explore Services",
   },
   home: {
     introTitle: "Performance. Recovery. Ocean.",
-    introText: "Based in Haifa, Moatasem Akash combines 12 years of hands-on experience in sports massage, physical training, and longboard surf coaching. Whether you need deep muscle recovery, technique-focused sport training, or private surf lessons — every session is built around your goals.",
+    introText: "Moatasem Akash brings 12 years of hands-on experience in sports massage, physical training, and longboard surf coaching. Whether you need deep muscle recovery, technique-focused sport training, or private surf lessons — every session is built around your goals.",
     servicesTitle: "What I Offer",
     quoteText: "\"Train smart, recover right, and let the ocean do the rest.\"",
     testimonialsTitle: "What People Say",
@@ -25,12 +25,13 @@ const en = {
   },
   about: {
     title: "About Moatasem",
-    subtitle: "12 years of sports massage, training, and surfing the Mediterranean",
+    subtitle: "12 years of sports massage, training, and surfing around the world",
     story: {
-      p1: "I grew up in Haifa, right by the sea. The Mediterranean has been part of my daily life for as long as I can remember — and it shaped the way I think about movement, recovery, and what it means to stay in tune with your body.",
-      p2: "I started studying sports massage and physical therapy over a decade ago. Since then I've earned 12 professional certifications, worked with athletes from different backgrounds, and built a practice focused on real results — whether that's fixing a muscle issue, improving your athletic performance, or getting you ready for competition.",
-      p3: "Surfing is a big part of who I am. I ride longboard, and I also teach it — from complete beginners to people who want to sharpen their technique and style. I approach coaching the same way I approach massage: hands-on, personal, and focused on what works for you.",
-      p4: "I keep things straightforward. No fluff, no gimmicks. I care about doing good work, helping people move better, and spending as much time in the water as possible.",
+      p1: "I grew up by the sea. The ocean has been part of my daily life for as long as I can remember — and it shaped the way I think about movement, recovery, and what it means to stay in tune with your body.",
+      p2: "For 10 years I worked as a lifeguard — watching the water, reading conditions, and keeping people safe. That experience sharpened my instincts and gave me a deep understanding of the body under pressure. It's a foundation I carry into everything I do.",
+      p3: "I started studying sports massage and physical therapy over a decade ago. Since then I've earned 12 professional certifications, worked with athletes from different backgrounds, and built a practice focused on real results — whether that's fixing a muscle issue, improving your athletic performance, or getting you ready for competition.",
+      p4: "Surfing is a big part of who I am. I ride longboard, and I also teach it — from complete beginners to people who want to sharpen their technique and style. I approach coaching the same way I approach massage: hands-on, personal, and focused on what works for you.",
+      p5: "I keep things straightforward. No fluff, no gimmicks. I care about doing good work, helping people move better, and spending as much time in the water as possible.",
     },
     certificationsTitle: "12 Professional Certifications",
     certifications: [
@@ -46,6 +47,7 @@ const en = {
       "Neuromuscular Therapy",
       "Postural Assessment",
       "Surf Instruction (ISA Certified)",
+      "Professional Lifeguard (10 Years)",
     ],
   },
   services: {
@@ -72,7 +74,7 @@ const en = {
     },
     surf: {
       title: "Surf Lessons & Coaching",
-      description: "Private longboard surf lessons in Haifa — from your first time standing up to refining your style and reading waves. I teach surfing technique, ocean awareness, and how to build confidence in the water. All levels welcome.",
+      description: "Private longboard surf lessons — from your first time standing up to refining your style and reading waves. I teach surfing technique, ocean awareness, and how to build confidence in the water. All levels welcome.",
       benefits: ["Proper surf technique from day one", "Wave reading and ocean awareness", "Style development and flow", "Board handling and safety"],
       audience: "For complete beginners, intermediate surfers, and anyone who wants to improve their surfing with one-on-one coaching.",
       image: "/images/surf-teaching.jpg",
@@ -131,7 +133,7 @@ const en = {
         excerpt: "Longboarding isn't about tricks or speed. It's about flow, style, and reading the ocean.",
         date: "February 28, 2026",
         category: "Surfing",
-        content: "People ask me all the time why longboard and not shortboard. Simple — I'm into flow, not flashy tricks.\n\nLongboarding is a different kind of surfing. It's slower, more deliberate. You have to read the wave differently, position yourself with more intention, and think about style and footwork. It's less about attacking the wave and more about working with it.\n\nThat's exactly why I love teaching it. When a student catches their first wave on a longboard, there's this moment where everything clicks — balance, timing, the feel of the water moving under you. That's what surfing is about.\n\nI teach all levels. If you've never surfed before, we start with the basics — paddling, popping up, wave selection. If you've been surfing and want to improve your style, we work on cross-stepping, nose riding, trimming, and reading the lineup.\n\nEvery session is in the water, one-on-one. I surf with you, watch your technique, and give you real-time feedback. No classroom theory — just surfing.\n\nThe Mediterranean in Haifa has great longboard waves. If you want to learn or get better, hit me up.",
+        content: "People ask me all the time why longboard and not shortboard. Simple — I'm into flow, not flashy tricks.\n\nLongboarding is a different kind of surfing. It's slower, more deliberate. You have to read the wave differently, position yourself with more intention, and think about style and footwork. It's less about attacking the wave and more about working with it.\n\nThat's exactly why I love teaching it. When a student catches their first wave on a longboard, there's this moment where everything clicks — balance, timing, the feel of the water moving under you. That's what surfing is about.\n\nI teach all levels. If you've never surfed before, we start with the basics — paddling, popping up, wave selection. If you've been surfing and want to improve your style, we work on cross-stepping, nose riding, trimming, and reading the lineup.\n\nEvery session is in the water, one-on-one. I surf with you, watch your technique, and give you real-time feedback. No classroom theory — just surfing.\n\nIf you want to learn or get better, hit me up.",
       },
     ],
   },
@@ -150,7 +152,7 @@ const en = {
     },
   },
   footer: {
-    tagline: "Sports massage, recovery & surf coaching in Haifa",
+    tagline: "Sports massage, recovery & surf coaching worldwide",
     quickLinks: "Quick Links",
     connect: "Connect",
     rights: "All rights reserved.",

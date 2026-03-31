@@ -3,21 +3,21 @@ import "./globals.css";
 import ClientLayout from "./ClientLayout";
 
 export const metadata: Metadata = {
-  title: "Moatasem Akash — Healing through Movement, Touch & Ocean Flow",
+  title: "Moatasem Akash — Sports Massage, Recovery & Surf Coaching",
   description:
-    "Therapy, classic sports massage, and private longboard surf lessons in Haifa. 12 certified specializations. Book your session with Moatasem Akash.",
+    "Classic sports massage, physical training, and private longboard surf lessons. 12 certified specializations. Book your session with Moatasem Akash.",
   keywords: [
-    "therapy Haifa",
     "sports massage",
+    "deep tissue massage",
     "longboard surf lessons",
-    "wellness",
-    "healing",
+    "surf coaching",
+    "recovery",
     "Moatasem Akash",
   ],
   openGraph: {
-    title: "Moatasem Akash — Healing through Movement, Touch & Ocean Flow",
+    title: "Moatasem Akash — Sports Massage, Recovery & Surf Coaching",
     description:
-      "Therapy, classic sports massage, and private longboard surf lessons in Haifa.",
+      "Classic sports massage, physical training, and private longboard surf lessons.",
     type: "website",
   },
 };

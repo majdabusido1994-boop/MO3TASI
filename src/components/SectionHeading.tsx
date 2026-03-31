@@ -18,10 +18,9 @@ export default function SectionHeading({ title, subtitle, light }: SectionHeadin
       className="text-center mb-16"
     >
       <h2
-        className={`text-3xl md:text-4xl lg:text-5xl font-bold mb-4 ${
+        className={`text-3xl md:text-4xl lg:text-5xl font-bold mb-4 heading-font ${
           light ? "text-white" : "text-ocean-900"
         }`}
-        style={{ fontFamily: "var(--font-heading)" }}
       >
         {title}
       </h2>
@@ -30,7 +29,7 @@ export default function SectionHeading({ title, subtitle, light }: SectionHeadin
           {subtitle}
         </p>
       )}
-      <div className={`mt-6 w-16 h-1 mx-auto rounded-full ${light ? "bg-teal-400" : "bg-teal-500"}`} />
+      <div className={`mt-6 w-16 h-1 mx-auto rounded-full ${light ? "bg-gradient-to-r from-teal-400 to-ocean-300" : "bg-gradient-to-r from-teal-500 to-ocean-400"}`} />
     </motion.div>
   );
 }

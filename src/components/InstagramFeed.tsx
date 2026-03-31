@@ -20,7 +20,7 @@ const placeholderPosts = [
   { id: "2", gradient: "from-teal-200 to-teal-300", label: "Surf" },
   { id: "3", gradient: "from-ocean-100 to-ocean-300", label: "Healing" },
   { id: "4", gradient: "from-teal-100 to-ocean-200", label: "Movement" },
-  { id: "5", gradient: "from-ocean-300 to-teal-200", label: "Haifa" },
+  { id: "5", gradient: "from-ocean-300 to-teal-200", label: "Waves" },
   { id: "6", gradient: "from-teal-200 to-ocean-100", label: "Flow" },
 ];
 
