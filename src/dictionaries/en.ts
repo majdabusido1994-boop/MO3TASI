@@ -159,8 +159,8 @@ const en = {
   },
   testimonials: [
     {
-      name: "Sarah M.",
-      text: "Moatasem's sports massage is next level. He found tension I didn't even know I had. Three sessions in and my shoulder issue from training is completely gone.",
+      name: "Majd Mohammed",
+      text: "Mo3tasem my man, thank you for this wonderful experience.",
       role: "Marathon Runner",
     },
     {
