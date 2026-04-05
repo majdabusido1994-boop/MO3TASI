@@ -32,20 +32,25 @@ export default function BookingForm() {
     };
 
     try {
-      // Submit to Netlify Forms
-      const netlifyForm = new URLSearchParams();
-      netlifyForm.append("form-name", "booking");
-      Object.entries(data).forEach(([key, val]) => netlifyForm.append(key, val));
-
-      const res = await fetch("/", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: netlifyForm.toString(),
-      });
-
-      if (!res.ok) {
-        throw new Error("Booking request failed");
+      // Compose WhatsApp message with booking details
+      const lines = [
+        "*New Booking Request*",
+        "",
+        `*Name:* ${data.name}`,
+        `*Email:* ${data.email}`,
+        `*Phone:* ${data.phone}`,
+        `*Service:* ${data.service}`,
+        `*Date:* ${data.date}`,
+        `*Time:* ${data.time}`,
+      ];
+      if (data.message) {
+        lines.push("", `*Message:* ${data.message}`);
       }
+      const text = encodeURIComponent(lines.join("\n"));
+      const waUrl = `https://api.whatsapp.com/send?phone=351913920277&text=${text}`;
+
+      // Open WhatsApp in a new tab with pre-filled booking details
+      window.open(waUrl, "_blank", "noopener,noreferrer");
 
       setSubmitted(true);
     } catch {
@@ -143,7 +148,7 @@ export default function BookingForm() {
                 type="tel"
                 required
                 className={inputClass}
-                placeholder="+972..."
+                placeholder="+351..."
                 name="phone"
               />
             </div>
@@ -226,7 +231,7 @@ export default function BookingForm() {
           <p className="text-center text-ocean-500 text-xs mt-4">
             {t.booking.form.whatsappFallback || "Or book directly via"}{" "}
             <a
-              href="https://wa.me/972507774694"
+              href="https://api.whatsapp.com/send?phone=351913920277"
               target="_blank"
               rel="noopener noreferrer"
               className="text-teal-600 font-medium hover:underline"

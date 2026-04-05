@@ -12,8 +12,8 @@ export default function ContactPage() {
     {
       icon: FaWhatsapp,
       label: t.contact.whatsapp,
-      value: "+972 50 777 4694",
-      href: "https://wa.me/972507774694",
+      value: "+351 913 920 277",
+      href: "https://api.whatsapp.com/send?phone=351913920277",
       color: "bg-green-50 text-green-600",
     },
     {

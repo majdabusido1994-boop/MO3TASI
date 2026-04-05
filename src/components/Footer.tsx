@@ -60,13 +60,13 @@ export default function Footer() {
             <ul className="space-y-3">
               <li>
                 <a
-                  href="https://wa.me/972507774694"
+                  href="https://api.whatsapp.com/send?phone=351913920277"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-3 text-ocean-300 text-sm hover:text-white transition-colors duration-300"
                 >
                   <FaWhatsapp className="text-lg" />
-                  +972 50 777 4694
+                  +351 913 920 277
                 </a>
               </li>
               <li>
