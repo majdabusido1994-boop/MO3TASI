@@ -37,27 +37,28 @@ export default function PhilosophyPage() {
         </div>
       </section>
 
-      {/* Featured Photo */}
-      <section className="px-6 -mt-10 relative z-10">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9, delay: 0.3 }}
-          className="max-w-3xl mx-auto"
-        >
-          <div className="rounded-3xl overflow-hidden shadow-2xl ring-1 ring-black/5 bg-ocean-950">
-            <img
-              src="/images/moatasem-philosophy.jpg"
-              alt="Moatasem sitting"
-              className="w-full h-auto object-contain"
-            />
-          </div>
-        </motion.div>
-      </section>
+      {/* Content with side photo */}
+      <section className="py-24 lg:py-32 px-6">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-5 gap-12 lg:gap-16 items-start">
+          {/* Photo - sticky on desktop */}
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="lg:col-span-2 lg:sticky lg:top-28"
+          >
+            <div className="rounded-3xl overflow-hidden shadow-2xl ring-1 ring-black/5 bg-ocean-950">
+              <img
+                src="/images/moatasem-philosophy.jpg"
+                alt="Moatasem sitting"
+                className="w-full h-auto object-contain"
+              />
+            </div>
+          </motion.div>
 
-      {/* Content */}
-      <section className="pt-16 pb-24 lg:pb-32 px-6">
-        <div className="max-w-3xl mx-auto">
+          {/* Text */}
+          <div className="lg:col-span-3">
           {paragraphs.map((p, i) => (
             <motion.p
               key={i}
@@ -90,6 +91,7 @@ export default function PhilosophyPage() {
             <div className="w-16 h-0.5 bg-teal-400 mx-auto mb-6" />
             <p className="text-ocean-400 text-sm italic">~ Moatasem Akash</p>
           </motion.div>
+          </div>
         </div>
       </section>
     </>

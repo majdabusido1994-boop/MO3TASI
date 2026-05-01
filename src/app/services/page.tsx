@@ -6,8 +6,72 @@ import Link from "next/link";
 import { FaDumbbell, FaCheck, FaHandsHelping, FaWater, FaChevronDown } from "react-icons/fa";
 import { useI18n } from "@/lib/i18n";
 
+const PRICING = {
+  en: {
+    title: "Simple, Honest Pricing",
+    subtitle: "Every session is 1 hour — sports massage, sport training, or surf coaching.",
+    note: "Bundles are interchangeable across services. Sessions valid for 6 months.",
+    cta: "Book a Session",
+    plans: [
+      {
+        name: "Single Session",
+        price: "€60",
+        per: "/ 1 hour",
+        features: ["1 × 60-minute session", "Choose any service", "No commitment"],
+        highlight: false,
+      },
+      {
+        name: "5-Session Bundle",
+        price: "€270",
+        per: "€54 / session",
+        badge: "Most Popular",
+        features: ["5 × 60-minute sessions", "Mix any services", "Save €30 vs single", "Valid 6 months"],
+        highlight: true,
+      },
+      {
+        name: "10-Session Bundle",
+        price: "€500",
+        per: "€50 / session",
+        features: ["10 × 60-minute sessions", "Mix any services", "Save €100 vs single", "Priority booking"],
+        highlight: false,
+      },
+    ],
+  },
+  ar: {
+    title: "أسعار بسيطة وصريحة",
+    subtitle: "كل جلسة ساعة كاملة — تدليك رياضي، تدريب، أو دروس سيرف.",
+    note: "الباقات مرنة وتنطبق على كل الخدمات. صالحة لمدة 6 أشهر.",
+    cta: "احجز جلسة",
+    plans: [
+      {
+        name: "جلسة واحدة",
+        price: "€60",
+        per: "/ ساعة واحدة",
+        features: ["جلسة واحدة × 60 دقيقة", "اختر أي خدمة", "بدون التزام"],
+        highlight: false,
+      },
+      {
+        name: "باقة 5 جلسات",
+        price: "€270",
+        per: "€54 / جلسة",
+        badge: "الأكثر طلبًا",
+        features: ["5 جلسات × 60 دقيقة", "اخلط بين الخدمات", "وفّر €30", "صالحة 6 أشهر"],
+        highlight: true,
+      },
+      {
+        name: "باقة 10 جلسات",
+        price: "€500",
+        per: "€50 / جلسة",
+        features: ["10 جلسات × 60 دقيقة", "اخلط بين الخدمات", "وفّر €100", "أولوية في الحجز"],
+        highlight: false,
+      },
+    ],
+  },
+};
+
 export default function ServicesPage() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
+  const pricing = PRICING[locale];
   const [showRecovery, setShowRecovery] = useState(false);
 
   const services = [
@@ -278,6 +342,82 @@ export default function ServicesPage() {
               </motion.div>
             );
           })}
+        </div>
+      </section>
+
+      {/* Pricing */}
+      <section className="py-24 px-6 bg-gradient-to-b from-gray-50 to-white">
+        <div className="max-w-6xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-14"
+          >
+            <h2
+              className="text-3xl md:text-4xl font-bold text-ocean-900 mb-3"
+              style={{ fontFamily: "var(--font-heading)" }}
+            >
+              {pricing.title}
+            </h2>
+            <p className="text-ocean-600 max-w-2xl mx-auto">{pricing.subtitle}</p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+            {pricing.plans.map((plan, i) => (
+              <motion.div
+                key={plan.name}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+                className={`relative rounded-2xl p-8 flex flex-col ${
+                  plan.highlight
+                    ? "bg-ocean-950 text-white shadow-2xl ring-2 ring-teal-400 md:-translate-y-4"
+                    : "bg-white text-ocean-900 border border-gray-100 shadow-md"
+                }`}
+              >
+                {plan.badge && (
+                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-teal-400 text-ocean-950 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wide">
+                    {plan.badge}
+                  </span>
+                )}
+                <h3
+                  className={`text-xl font-semibold mb-4 ${plan.highlight ? "text-white" : "text-ocean-900"}`}
+                  style={{ fontFamily: "var(--font-heading)" }}
+                >
+                  {plan.name}
+                </h3>
+                <div className="mb-6">
+                  <span className="text-4xl font-bold">{plan.price}</span>
+                  <span className={`ml-2 text-sm ${plan.highlight ? "text-ocean-300" : "text-ocean-500"}`}>
+                    {plan.per}
+                  </span>
+                </div>
+                <ul className="space-y-3 mb-8 flex-1">
+                  {plan.features.map((f) => (
+                    <li key={f} className="flex items-start gap-3 text-sm">
+                      <FaCheck className={`mt-1 flex-shrink-0 ${plan.highlight ? "text-teal-400" : "text-teal-500"}`} />
+                      <span className={plan.highlight ? "text-ocean-100" : "text-ocean-700"}>{f}</span>
+                    </li>
+                  ))}
+                </ul>
+                <Link
+                  href="/booking"
+                  className={`text-center px-6 py-3 rounded-full font-semibold text-sm tracking-wide transition-all duration-300 cursor-pointer ${
+                    plan.highlight
+                      ? "bg-teal-400 text-ocean-950 hover:bg-teal-300"
+                      : "bg-ocean-900 text-white hover:bg-ocean-800"
+                  }`}
+                >
+                  {pricing.cta}
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+
+          <p className="text-center text-ocean-500 text-sm italic mt-10">{pricing.note}</p>
         </div>
       </section>
     </>
