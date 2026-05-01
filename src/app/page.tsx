@@ -60,10 +60,12 @@ export default function Home() {
         <Marquee pauseOnHover speed="slow" className="[--gap:1rem]">
           {[
             "/images/surf-blue-sky.jpg",
-            "/images/services-massage.jpg",
+            "/images/moatasem-massage-hands.jpg",
             "/images/surf-teaching.jpg",
-            "/images/portrait-board.jpg",
+            "/images/services-massage.jpg",
+            "/images/moatasem-paddleboard.jpg",
             "/images/surf-teal-wave.jpg",
+            "/images/portrait-board.jpg",
             "/images/surf-barrel.jpg",
             "/images/nazare-cliff.jpg",
           ].map((src) => (

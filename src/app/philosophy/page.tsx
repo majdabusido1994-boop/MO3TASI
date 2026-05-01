@@ -37,8 +37,26 @@ export default function PhilosophyPage() {
         </div>
       </section>
 
+      {/* Featured Photo */}
+      <section className="px-6 -mt-10 relative z-10">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.9, delay: 0.3 }}
+          className="max-w-3xl mx-auto"
+        >
+          <div className="rounded-3xl overflow-hidden shadow-2xl ring-1 ring-black/5">
+            <img
+              src="/images/moatasem-philosophy.jpg"
+              alt="Moatasem reflecting"
+              className="w-full h-[480px] md:h-[600px] object-cover"
+            />
+          </div>
+        </motion.div>
+      </section>
+
       {/* Content */}
-      <section className="py-24 lg:py-32 px-6">
+      <section className="pt-16 pb-24 lg:pb-32 px-6">
         <div className="max-w-3xl mx-auto">
           {paragraphs.map((p, i) => (
             <motion.p
