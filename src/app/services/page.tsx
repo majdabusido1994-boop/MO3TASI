@@ -37,6 +37,36 @@ const PRICING = {
       },
     ],
   },
+  pt: {
+    title: "Preços Simples e Honestos",
+    subtitle: "Cada sessão é de 1 hora — massagem de recuperação, treino desportivo, ou coaching de surf.",
+    note: "Os pacotes são intercambiáveis entre serviços. Sessões válidas por 6 meses.",
+    cta: "Marcar Sessão",
+    plans: [
+      {
+        name: "Sessão Única",
+        price: "€60",
+        per: "/ 1 hora",
+        features: ["1 × sessão de 60 minutos", "Escolhe qualquer serviço", "Sem compromisso"],
+        highlight: false,
+      },
+      {
+        name: "Pacote 5 Sessões",
+        price: "€270",
+        per: "€54 / sessão",
+        badge: "Mais Popular",
+        features: ["5 × sessões de 60 minutos", "Mistura qualquer serviço", "Poupa €30 vs avulso", "Válido 6 meses"],
+        highlight: true,
+      },
+      {
+        name: "Pacote 10 Sessões",
+        price: "€500",
+        per: "€50 / sessão",
+        features: ["10 × sessões de 60 minutos", "Mistura qualquer serviço", "Poupa €100 vs avulso", "Marcação prioritária"],
+        highlight: false,
+      },
+    ],
+  },
   ar: {
     title: "أسعار بسيطة وصريحة",
     subtitle: "كل جلسة ساعة كاملة — تدليك تعافي، تدريب، أو دروس سيرف.",

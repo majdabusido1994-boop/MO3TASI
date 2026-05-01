@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
 
-export type Locale = "en" | "ar";
+export type Locale = "en" | "ar" | "pt";
 
 interface BlogPost {
   slug: string;
@@ -142,9 +142,10 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
   const [dictionary, setDictionary] = useState<Dictionary | null>(null);
 
   const loadDictionary = useCallback(async (loc: Locale) => {
-    const dict = loc === "ar"
-      ? (await import("@/dictionaries/ar")).default
-      : (await import("@/dictionaries/en")).default;
+    let dict;
+    if (loc === "ar") dict = (await import("@/dictionaries/ar")).default;
+    else if (loc === "pt") dict = (await import("@/dictionaries/pt")).default;
+    else dict = (await import("@/dictionaries/en")).default;
     setDictionary(dict as Dictionary);
   }, []);
 
@@ -157,7 +158,7 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const saved = localStorage.getItem("locale") as Locale | null;
-    if (saved && (saved === "en" || saved === "ar")) {
+    if (saved && (saved === "en" || saved === "ar" || saved === "pt")) {
       setLocale(saved);
     }
   }, [setLocale]);
