@@ -45,11 +45,11 @@ export default function PhilosophyPage() {
           transition={{ duration: 0.9, delay: 0.3 }}
           className="max-w-3xl mx-auto"
         >
-          <div className="rounded-3xl overflow-hidden shadow-2xl ring-1 ring-black/5">
+          <div className="rounded-3xl overflow-hidden shadow-2xl ring-1 ring-black/5 bg-ocean-950">
             <img
               src="/images/moatasem-philosophy.jpg"
-              alt="Moatasem reflecting"
-              className="w-full h-[480px] md:h-[600px] object-cover"
+              alt="Moatasem sitting"
+              className="w-full h-auto object-contain"
             />
           </div>
         </motion.div>
