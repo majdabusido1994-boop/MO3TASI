@@ -31,7 +31,8 @@ const en = {
       p2: "For 10 years I worked as a lifeguard — watching the water, reading conditions, and keeping people safe. That experience sharpened my instincts and gave me a deep understanding of the body under pressure. It's a foundation I carry into everything I do.",
       p3: "I started studying sports massage and physical therapy over a decade ago. Since then I've earned 12 professional certifications, worked with athletes from different backgrounds, and built a practice focused on real results — whether that's fixing a muscle issue, improving your athletic performance, or getting you ready for competition.",
       p4: "Surfing is a big part of who I am. I ride longboard, and I also teach it — from complete beginners to people who want to sharpen their technique and style. I approach coaching the same way I approach massage: hands-on, personal, and focused on what works for you.",
-      p5: "I keep things straightforward. No fluff, no gimmicks. I care about doing good work, helping people move better, and spending as much time in the water as possible.",
+      p5: "My specialty is longboard — and in particular, the cross step: the art of walking up and down the board while you ride. It's one of the hardest things to learn cleanly, and one of the most rewarding. I break it down into footwork drills, weight transfer, and timing with the wave so you stop fighting the board and start dancing on it. Whether you've never crossed a foot over or you're trying to nose ride with style, I'll meet you exactly where you are.",
+      p6: "I keep things straightforward. No fluff, no gimmicks. I care about doing good work, helping people move better, and spending as much time in the water as possible.",
     },
     certificationsTitle: "12 Professional Certifications",
     certifications: [

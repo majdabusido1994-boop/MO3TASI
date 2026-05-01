@@ -9,7 +9,7 @@ import { useI18n } from "@/lib/i18n";
 const PRICING = {
   en: {
     title: "Simple, Honest Pricing",
-    subtitle: "Every session is 1 hour — sports massage, sport training, or surf coaching.",
+    subtitle: "Every session is 1 hour — recovery massage, sport training, or surf coaching.",
     note: "Bundles are interchangeable across services. Sessions valid for 6 months.",
     cta: "Book a Session",
     plans: [
@@ -39,7 +39,7 @@ const PRICING = {
   },
   ar: {
     title: "أسعار بسيطة وصريحة",
-    subtitle: "كل جلسة ساعة كاملة — تدليك رياضي، تدريب، أو دروس سيرف.",
+    subtitle: "كل جلسة ساعة كاملة — تدليك تعافي، تدريب، أو دروس سيرف.",
     note: "الباقات مرنة وتنطبق على كل الخدمات. صالحة لمدة 6 أشهر.",
     cta: "احجز جلسة",
     plans: [
